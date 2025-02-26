@@ -36,9 +36,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.wordwave.homebar.HomeBar
-import com.google.relay.compose.ColumnScopeInstanceImpl.align
-
 
 @Preview(showSystemUi = true)
 @Composable
