@@ -3,6 +3,8 @@
     <dimen name="padding_large">15dp</dimen>
     <dimen name="padding_small">5dp</dimen>
     <dimen name="padding_big">30dp</dimen>
-    <dimen name="title_size">24sp</dimen>
-
+    <dimen name="title_size">24dp</dimen>
+    <dimen name="main_text">16dp</dimen>
+    <dimen name="round_shape">10dp</dimen>
+    <dimen name="padding_10">10dp</dimen>
 </resources>

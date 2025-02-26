@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -26,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -33,6 +37,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,21 +48,56 @@ fun HomePageScreen() {
     val bigPadding = dimensionResource(R.dimen.padding_big)
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
         Bar(stringResource(R.string.bar_title))
-        HorizontalDivider(
-            thickness = 2.dp,
-            color = colorResource(R.color.line)
-        )
+        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line))
+
+        Box(
+            modifier = Modifier
+                .padding(dimensionResource(R.dimen.padding_large))
+                .fillMaxWidth()
+                .height(45.dp)
+                .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
+                .background(colorResource(R.color.grey_graph))
+        ) {
+            Text(
+                text = stringResource(R.string.all_word),
+                fontSize = dimensionResource(R.dimen.main_text).value.sp,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(dimensionResource(R.dimen.padding_10)),
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line), modifier = Modifier.padding(start = bigPadding, end = bigPadding))
         Diagrams()
-        HorizontalDivider(
-            thickness = 2.dp,
-            color = colorResource(R.color.line),
-            modifier = Modifier.padding(start = bigPadding, end = bigPadding)
-        )
+        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line), modifier = Modifier.padding(start = bigPadding, end = bigPadding))
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            GamesTable()
+        }
+
+        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {
+            NavigationBar()
+        }
     }
 }
+
 
 
 @Composable
@@ -65,12 +105,12 @@ fun Bar(title: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = dimensionResource(R.dimen.padding_large))
     ) {
         Text(
             text = title,
             fontSize = dimensionResource(R.dimen.title_size).value.sp,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
+            fontWeight = FontWeight.SemiBold
         )
         val context = LocalContext.current
 
@@ -80,7 +120,7 @@ fun Bar(title: String) {
         ) {
             Image(
                 painter = painterResource(R.drawable.profile_icon),
-                contentDescription = "icon",
+                contentDescription = "icon"
             )
         }
     }
@@ -88,7 +128,7 @@ fun Bar(title: String) {
 }
 
 @Composable
-fun Diagrams(){
+fun Diagrams() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -97,12 +137,54 @@ fun Diagrams(){
     ) {
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(13.dp))
+                .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
                 .fillMaxSize()
                 .background(colorResource(R.color.grey_graph))
         ) {
-
         }
     }
 }
+
+@Composable
+fun GamesTable() {
+    Box(
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_large))
+            .fillMaxSize()
+            .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
+            .background(colorResource(R.color.grey_graph))
+    ) {
+
+    }
+}
+
+@Composable
+fun NavigationBar() {
+    Box(
+        modifier = Modifier
+            .padding(top = 5.dp, start = 40.dp, end = 40.dp)
+            .fillMaxWidth()
+            .height(42.dp)
+    ) {
+        IconButton(
+            onClick = {},
+            modifier = Modifier.align(Alignment.CenterStart)
+        ) {
+            Image(painterResource(R.drawable.home_ic), contentDescription = "Home_ic")
+        }
+        IconButton(
+            onClick = {},
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            Image(painterResource(R.drawable.add_button), contentDescription = "add_button")
+        }
+        IconButton(
+            onClick = {},
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            Image(painterResource(R.drawable.translate_ic), contentDescription = "translate_ic")
+        }
+    }
+}
+
 

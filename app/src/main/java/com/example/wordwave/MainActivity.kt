@@ -19,15 +19,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AllApp()
+            WordWaveTheme{
+                AllApp()
+
+            }
         }
     }
 }
 
 @Composable
-fun AllApp(){
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(Color.Transparent, darkIcons = true)
-    systemUiController.setNavigationBarColor(Color.Transparent, darkIcons = true)
+fun AllApp() {
+//    val systemUiController = rememberSystemUiController()
+//    systemUiController.setStatusBarColor(Color.Transparent, darkIcons = true)
+//    systemUiController.setNavigationBarColor(Color.Transparent, darkIcons = true)
     HomePageScreen()
 }
