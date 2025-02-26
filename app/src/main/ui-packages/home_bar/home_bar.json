@@ -1,0 +1,251 @@
+{
+  "name": "home_bar",
+  "version": 33,
+  "source-key": {
+    "type": "figma",
+    "file": "HVSlA1E3OUtstr0ZA6Xt0l",
+    "node": "49:44",
+    "version": "2189144444258992603",
+    "component-id": "48a42d5f322f9e8b9473a5a848152253fd05067f"
+  },
+  "default": "HomeBar",
+  "design": {
+    "atoms": [
+      {
+        "type": "group",
+        "id": "top_level",
+        "root": "true"
+      },
+      {
+        "type": "text",
+        "id": "title"
+      },
+      {
+        "type": "group",
+        "id": "profile-icon"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/outline/profile-circle"
+      },
+      {
+        "type": "group",
+        "id": "profile-circle"
+      },
+      {
+        "type": "vector",
+        "id": "Vector3"
+      },
+      {
+        "type": "vector",
+        "id": "Vector2"
+      },
+      {
+        "type": "vector",
+        "id": "Vector1"
+      },
+      {
+        "type": "vector",
+        "id": "Vector"
+      }
+    ],
+    "modes": {
+      "HomeBar": {
+        "rules": [
+          {
+            "id": "top_level",
+            "padding": {
+              "left": 15.0,
+              "top": 9.0,
+              "right": 15.0,
+              "bottom": 9.0
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "children": [
+              "title",
+              "profile-icon"
+            ],
+            "item-spacing": 87.0,
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            }
+          },
+          {
+            "id": "title",
+            "font-weight": 500.0,
+            "text-content": "$title",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 24.0,
+            "line-height": 0.8333333587646484
+          },
+          {
+            "id": "profile-icon",
+            "tap-handler": "$onClick",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/outline/profile-circle"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "vuesax/outline/profile-circle",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "profile-circle"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "profile-circle",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Vector3",
+              "Vector2",
+              "Vector1",
+              "Vector"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector3",
+            "margin": {
+              "left": 9.975006103515625,
+              "top": 6.850006103515625,
+              "right": 9.949993133544922,
+              "bottom": 13.087495803833008
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector3.svg"
+          },
+          {
+            "id": "Vector2",
+            "margin": {
+              "left": 5.6337432861328125,
+              "top": 18.368743896484375,
+              "right": 5.630401611328125,
+              "bottom": 1.5625076293945312
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector2.svg"
+          },
+          {
+            "id": "Vector1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Vector",
+            "margin": 1.5625,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector.svg"
+          }
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "title": {
+      "data-type": "text",
+      "required": false,
+      "description": ""
+    },
+    "onClick": {
+      "data-type": "void-callback",
+      "required": false,
+      "description": ""
+    }
+  },
+  "previews": [
+    {
+      "design": "HomeBar",
+      "size": {
+        "width": 244.0,
+        "height": 48.0
+      },
+      "parameters": {
+        "title": " Главная"
+      }
+    }
+  ],
+  "adin-component-search-paths": [],
+  "image-search-paths": [],
+  "vector-search-paths": []
+}

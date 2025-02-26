@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">WordWave</string>
+    <string name="bar_title">Язык</string>
+    <string name="tick"></string>
+</resources>
