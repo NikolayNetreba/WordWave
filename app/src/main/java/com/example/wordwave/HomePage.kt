@@ -147,6 +147,7 @@ fun AllWordButton(){
                 .padding(
                     end = dimensionResource(R.dimen.padding_10))
         )
+
     }
 }
 
