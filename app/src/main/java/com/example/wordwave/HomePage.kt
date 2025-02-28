@@ -41,11 +41,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Preview(showSystemUi = true)
 @Composable
 fun HomePageScreen() {
     val bigPadding = dimensionResource(R.dimen.padding_big)
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(color = Color.White)
 
     Column(
         modifier = Modifier
@@ -55,28 +58,18 @@ fun HomePageScreen() {
     ) {
         Bar(stringResource(R.string.bar_title))
         HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line))
-
-        Box(
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_large))
-                .fillMaxWidth()
-                .height(45.dp)
-                .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
-                .background(colorResource(R.color.grey_graph))
-        ) {
-            Text(
-                text = stringResource(R.string.all_word),
-                fontSize = dimensionResource(R.dimen.main_text).value.sp,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(dimensionResource(R.dimen.padding_10)),
-                fontWeight = FontWeight.Medium
-            )
-        }
-
-        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line), modifier = Modifier.padding(start = bigPadding, end = bigPadding))
+        AllWordButton()
+        HorizontalDivider(
+            thickness = 2.dp,
+            color = colorResource(R.color.line),
+            modifier = Modifier.padding(start = bigPadding, end = bigPadding)
+        )
         Diagrams()
-        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line), modifier = Modifier.padding(start = bigPadding, end = bigPadding))
+        HorizontalDivider(
+            thickness = 2.dp,
+            color = colorResource(R.color.line),
+            modifier = Modifier.padding(start = bigPadding, end = bigPadding)
+        )
 
         Column(
             modifier = Modifier
@@ -97,7 +90,6 @@ fun HomePageScreen() {
         }
     }
 }
-
 
 
 @Composable
@@ -125,6 +117,37 @@ fun Bar(title: String) {
         }
     }
 
+}
+
+@Composable
+fun AllWordButton(){
+
+    Box(
+        modifier = Modifier
+            .padding(dimensionResource(R.dimen.padding_large))
+            .fillMaxWidth()
+            .height(45.dp)
+            .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
+            .background(colorResource(R.color.grey_graph))
+    ) {
+        Text(
+            text = stringResource(R.string.all_word),
+            fontSize = dimensionResource(R.dimen.main_text).value.sp,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = dimensionResource(R.dimen.padding_10)),
+            fontWeight = FontWeight.Medium
+        )
+
+        Image(
+            painterResource(R.drawable.baseline_arrow_forward_ios_24),
+            contentDescription = " ",
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(
+                    end = dimensionResource(R.dimen.padding_10))
+        )
+    }
 }
 
 @Composable
