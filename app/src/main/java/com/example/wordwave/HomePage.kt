@@ -82,7 +82,7 @@ fun HomePageScreen() {
 
 
 @Composable
-fun Bar(title: String) {
+private fun Bar(title: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -97,7 +97,9 @@ fun Bar(title: String) {
 
         IconButton(
             onClick = { Toast.makeText(context, "HI", Toast.LENGTH_SHORT).show() },
-            modifier = Modifier.align(Alignment.CenterEnd)
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(dimensionResource(R.dimen.padding_10))
         ) {
             Image(
                 painter = painterResource(R.drawable.profile_icon),
@@ -127,7 +129,7 @@ fun AllWordButton() {
             fontSize = dimensionResource(R.dimen.main_text).value.sp,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = dimensionResource(R.dimen.padding_10)),
+                .padding(start = dimensionResource(R.dimen.padding_15)),
             fontWeight = FontWeight.Medium
         )
 
@@ -137,7 +139,7 @@ fun AllWordButton() {
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(
-                    end = dimensionResource(R.dimen.padding_10)
+                    end = dimensionResource(R.dimen.padding_15)
                 )
         )
 
@@ -170,7 +172,9 @@ fun GamesTable() {
         Text(
             text = stringResource(R.string.game_table_title),
             fontSize = dimensionResource(R.dimen.title_size).value.sp,
-            modifier = Modifier.align(Alignment.TopStart).padding(10.dp)
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(10.dp)
         )
     }
 }

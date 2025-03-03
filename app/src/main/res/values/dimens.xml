@@ -6,6 +6,7 @@
     <dimen name="title_size">24dp</dimen>
     <dimen name="main_text">16dp</dimen>
     <dimen name="round_shape">10dp</dimen>
-    <dimen name="padding_10">15dp</dimen>
+    <dimen name="padding_10">10dp</dimen>
+    <dimen name="padding_15">15dp</dimen>
     <dimen name="title_size_20">20dp</dimen>
 </resources>
