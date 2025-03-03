@@ -1,26 +1,18 @@
 package com.example.wordwave
 
-import android.icu.text.CaseMap.Title
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -29,14 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -120,7 +109,7 @@ fun Bar(title: String) {
 }
 
 @Composable
-fun AllWordButton(){
+fun AllWordButton() {
 
     Box(
         modifier = Modifier
@@ -129,6 +118,9 @@ fun AllWordButton(){
             .height(45.dp)
             .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
             .background(colorResource(R.color.grey_graph))
+            .clickable {
+
+            }
     ) {
         Text(
             text = stringResource(R.string.all_word),
@@ -145,7 +137,8 @@ fun AllWordButton(){
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(
-                    end = dimensionResource(R.dimen.padding_10))
+                    end = dimensionResource(R.dimen.padding_10)
+                )
         )
 
     }
@@ -158,14 +151,10 @@ fun Diagrams() {
             .fillMaxWidth()
             .height(260.dp)
             .padding(dimensionResource(R.dimen.padding_large))
+            .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
+            .background(colorResource(R.color.grey_graph))
     ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
-                .fillMaxSize()
-                .background(colorResource(R.color.grey_graph))
-        ) {
-        }
+
     }
 }
 
@@ -178,7 +167,11 @@ fun GamesTable() {
             .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
             .background(colorResource(R.color.grey_graph))
     ) {
-
+        Text(
+            text = stringResource(R.string.game_table_title),
+            fontSize = dimensionResource(R.dimen.title_size).value.sp,
+            modifier = Modifier.align(Alignment.TopStart).padding(10.dp)
+        )
     }
 }
 
