@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation (libs.androidx.foundation)
     implementation(libs.google.accompanist.systemuicontroller)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)

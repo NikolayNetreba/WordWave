@@ -4,16 +4,10 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,14 +63,14 @@ fun HomePageScreen() {
         }
 
         HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line))
-
         Box(
             modifier = Modifier
-                .fillMaxWidth()
                 .background(Color.White)
+                .fillMaxWidth()
         ) {
             NavigationBar()
         }
+
     }
 }
 
@@ -99,7 +93,7 @@ private fun Bar(title: String) {
             onClick = { Toast.makeText(context, "HI", Toast.LENGTH_SHORT).show() },
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(dimensionResource(R.dimen.padding_10))
+                .padding(start = dimensionResource(R.dimen.padding_10))
         ) {
             Image(
                 painter = painterResource(R.drawable.profile_icon),
@@ -186,24 +180,25 @@ fun NavigationBar() {
             .padding(top = 5.dp, start = 40.dp, end = 40.dp)
             .fillMaxWidth()
             .height(42.dp)
+            .background(Color.White)
     ) {
         IconButton(
             onClick = {},
             modifier = Modifier.align(Alignment.CenterStart)
         ) {
-            Image(painterResource(R.drawable.home_ic), contentDescription = "Home_ic")
+            Icon(painterResource(R.drawable.home_ic), contentDescription = "Home_ic")
         }
         IconButton(
             onClick = {},
             modifier = Modifier.align(Alignment.Center)
         ) {
-            Image(painterResource(R.drawable.add_button), contentDescription = "add_button")
+            Icon(painterResource(R.drawable.add_button), contentDescription = "add_button")
         }
         IconButton(
             onClick = {},
             modifier = Modifier.align(Alignment.CenterEnd)
         ) {
-            Image(painterResource(R.drawable.translate_ic), contentDescription = "translate_ic")
+            Icon(painterResource(R.drawable.translate_ic), contentDescription = "translate_ic")
         }
     }
 }

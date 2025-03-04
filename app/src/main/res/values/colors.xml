@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="line">#CAC4D0</color>
     <color name="grey_graph">#F2F2F7</color>
+    <color name="bar">#507ba0</color>
 </resources>
