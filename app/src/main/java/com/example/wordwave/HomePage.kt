@@ -1,15 +1,10 @@
 package com.example.wordwave
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,68 +19,50 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-@Preview(showSystemUi = true)
 @Composable
-fun HomePageScreen() {
-    val bigPadding = dimensionResource(R.dimen.padding_big)
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(color = Color.White)
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) {
-        Bar(stringResource(R.string.bar_title))
-        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line))
-        AllWordButton()
-        HorizontalDivider(
-            thickness = 2.dp,
-            color = colorResource(R.color.line),
-            modifier = Modifier.padding(start = bigPadding, end = bigPadding)
-        )
-        Diagrams()
-        HorizontalDivider(
-            thickness = 2.dp,
-            color = colorResource(R.color.line),
-            modifier = Modifier.padding(start = bigPadding, end = bigPadding)
-        )
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
-            GamesTable()
-        }
-
-        HorizontalDivider(thickness = 2.dp, color = colorResource(R.color.line))
-        Box(
-            modifier = Modifier
-                .background(Color.White)
-                .fillMaxWidth()
-        ) {
-            NavigationBar()
-        }
-
-    }
+fun HomePageScreen(navController: NavHostController) {
+    Scaffold(
+        topBar = { Bar() },
+        bottomBar = { NavigationBar{
+            navController.navigate("home_screen")
+        } },
+        content = { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(Color.White)
+            ) {
+                AllWordButton{
+                    navController.navigate("vocabulary_screen")
+                }
+                HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
+                Diagrams()
+                HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
+                GamesTable()
+            }
+        },
+        containerColor = Color.White
+    )
 }
 
-
 @Composable
-private fun Bar(title: String) {
+private fun Bar() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .background(colorResource(R.color.bar))
+            .statusBarsPadding()
     ) {
         Text(
-            text = title,
+            text = stringResource(R.string.bar_title),
             fontSize = dimensionResource(R.dimen.title_size).value.sp,
             modifier = Modifier.align(Alignment.Center),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = Color.White
         )
         val context = LocalContext.current
 
@@ -93,50 +70,45 @@ private fun Bar(title: String) {
             onClick = { Toast.makeText(context, "HI", Toast.LENGTH_SHORT).show() },
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = dimensionResource(R.dimen.padding_10))
+                .padding(vertical = 8.dp, horizontal = 6.dp)
         ) {
-            Image(
+            Icon(
                 painter = painterResource(R.drawable.profile_icon),
-                contentDescription = "icon"
+                contentDescription = "icon",
+                tint = Color.White
             )
         }
     }
 
 }
 
-@Composable
-fun AllWordButton() {
 
+@Composable
+fun AllWordButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .padding(dimensionResource(R.dimen.padding_large))
+            .padding(16.dp)
             .fillMaxWidth()
             .height(45.dp)
-            .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
+            .clip(RoundedCornerShape(12.dp))
             .background(colorResource(R.color.grey_graph))
-            .clickable {
-
-            }
+            .clickable { onClick() }
     ) {
         Text(
             text = stringResource(R.string.all_word),
-            fontSize = dimensionResource(R.dimen.main_text).value.sp,
+            fontSize = 18.sp,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = dimensionResource(R.dimen.padding_15)),
+                .padding(start = 16.dp),
             fontWeight = FontWeight.Medium
         )
-
-        Image(
+        Icon(
             painterResource(R.drawable.baseline_arrow_forward_ios_24),
-            contentDescription = " ",
+            contentDescription = "Arrow",
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(
-                    end = dimensionResource(R.dimen.padding_15)
-                )
+                .padding(end = 16.dp)
         )
-
     }
 }
 
@@ -144,28 +116,26 @@ fun AllWordButton() {
 fun Diagrams() {
     Box(
         modifier = Modifier
+            .padding(16.dp)
             .fillMaxWidth()
             .height(260.dp)
-            .padding(dimensionResource(R.dimen.padding_large))
-            .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
+            .clip(RoundedCornerShape(12.dp))
             .background(colorResource(R.color.grey_graph))
-    ) {
-
-    }
+    ) {}
 }
 
 @Composable
 fun GamesTable() {
     Box(
         modifier = Modifier
-            .padding(dimensionResource(R.dimen.padding_large))
+            .padding(16.dp)
             .fillMaxSize()
-            .clip(RoundedCornerShape(dimensionResource(R.dimen.round_shape)))
+            .clip(RoundedCornerShape(12.dp))
             .background(colorResource(R.color.grey_graph))
     ) {
         Text(
             text = stringResource(R.string.game_table_title),
-            fontSize = dimensionResource(R.dimen.title_size).value.sp,
+            fontSize = 20.sp,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(10.dp)
@@ -174,33 +144,37 @@ fun GamesTable() {
 }
 
 @Composable
-fun NavigationBar() {
-    Box(
-        modifier = Modifier
-            .padding(top = 5.dp, start = 40.dp, end = 40.dp)
-            .fillMaxWidth()
-            .height(42.dp)
-            .background(Color.White)
+fun NavigationBar(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier.statusBarsPadding()
     ) {
-        IconButton(
-            onClick = {},
-            modifier = Modifier.align(Alignment.CenterStart)
+        HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(Color.White),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(painterResource(R.drawable.home_ic), contentDescription = "Home_ic")
-        }
-        IconButton(
-            onClick = {},
-            modifier = Modifier.align(Alignment.Center)
-        ) {
-            Icon(painterResource(R.drawable.add_button), contentDescription = "add_button")
-        }
-        IconButton(
-            onClick = {},
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-            Icon(painterResource(R.drawable.translate_ic), contentDescription = "translate_ic")
+            IconButton(onClick) {
+                Icon(
+                    painterResource(R.drawable.home_ic),
+                    contentDescription = "Home"
+                )
+            }
+            IconButton(onClick = {}) {
+                Icon(
+                    painterResource(R.drawable.add_button),
+                    contentDescription = "Add"
+                )
+            }
+            IconButton(onClick = {}) {
+                Icon(
+                    painterResource(R.drawable.translate_ic),
+                    contentDescription = "Translate"
+                )
+            }
         }
     }
 }
-
-
