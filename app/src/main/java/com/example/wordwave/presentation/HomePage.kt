@@ -1,4 +1,4 @@
-package com.example.wordwave
+package com.example.wordwave.presentation
 
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -20,7 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.navigation.compose.rememberNavController
+import com.example.wordwave.R
 
 @Composable
 fun HomePageScreen(navController: NavHostController) {
@@ -51,6 +52,8 @@ fun HomePageScreen(navController: NavHostController) {
 
 @Composable
 private fun Bar() {
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -64,7 +67,6 @@ private fun Bar() {
             fontWeight = FontWeight.SemiBold,
             color = Color.White
         )
-        val context = LocalContext.current
 
         IconButton(
             onClick = { Toast.makeText(context, "HI", Toast.LENGTH_SHORT).show() },
@@ -177,4 +179,11 @@ fun NavigationBar(onClick: () -> Unit) {
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomePageScreenPreview() {
+    val navController = rememberNavController()
+    HomePageScreen(navController = navController)
 }

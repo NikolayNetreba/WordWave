@@ -1,4 +1,4 @@
-package com.example.wordwave
+package com.example.wordwave.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,7 +10,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.wordwave.ui.theme.WordWaveTheme
+import com.example.wordwave.R
+import com.example.wordwave.presentation.ui.theme.WordWaveTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {

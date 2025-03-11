@@ -1,8 +1,5 @@
-package com.example.wordwave
+package com.example.wordwave.presentation
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,7 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.navigation.compose.rememberNavController
+import com.example.wordwave.R
 
 
 @Composable
@@ -42,12 +40,14 @@ fun VocabularyScreen(navController: NavController) {
     val categories = listOf("Все", "Изучаемые", "Выученные", "Фразы", "Слова")
 
     Scaffold(
-        topBar = { Column {
-            VocabularyTopBar()
-            CategoryTabs(categories)
-        }},
+        topBar = {
+            Column {
+                VocabularyTopBar()
+                CategoryTabs(categories)
+            }
+        },
         bottomBar = {
-            NavigationBar{
+            NavigationBar {
                 navController.navigate("home_screen")
             }
         },
@@ -68,7 +68,7 @@ fun VocabularyScreen(navController: NavController) {
 
 @Composable
 fun CategoryTabs(categories: List<String>) {
-    var selectedCategoryIndex = remember { mutableStateOf(0) }
+    val selectedCategoryIndex = remember { mutableStateOf(0) }
 
     LazyRow(
         modifier = Modifier
@@ -97,13 +97,13 @@ fun CategoryTab(category: String, isSelected: Boolean, onClick: () -> Unit) {
         color = if (isSelected) Color.White else colorResource(R.color.text_bar),
         modifier = Modifier
             .padding(horizontal = 10.dp, vertical = 3.dp)
-            .clickable {onClick()}
+            .clickable { onClick() }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VocabularyTopBar() {
+private fun VocabularyTopBar() {
     TopAppBar(
         title = {
             Box(
@@ -184,6 +184,13 @@ fun NoteItem(word: String, translation: String, isFirst: Boolean) {
             Icon(painterResource(R.drawable.volium), contentDescription = "Произношение")
         }
     }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun VocabularyPreview() {
+    val navController = rememberNavController()
+    VocabularyScreen(navController)
 }
 
 
