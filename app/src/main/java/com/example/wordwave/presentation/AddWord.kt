@@ -44,7 +44,15 @@ fun AddWordScreen(navController: NavController) {
         },
         containerColor = Color.White,
         content = { padding ->
-
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(Color.White),
+                contentAlignment = Alignment.Center
+            ) {
+                Content()
+            }
         }
     )
 }
@@ -98,10 +106,114 @@ private fun Content() {
             .background(Color.White)
             .padding(dimensionResource(R.dimen.padding_15))
     ) {
-
+        item {
+            ImageUploadSection()
+            Spacer(modifier = Modifier.height(16.dp))
+            WordInputSection()
+            Spacer(modifier = Modifier.height(16.dp))
+            TranslationSection()
+            Spacer(modifier = Modifier.height(16.dp))
+            ExampleUsageSection()
+        }
     }
 }
 
+@Composable
+private fun ImageUploadSection() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .background(colorResource(R.color.grey_graph), RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                painter = painterResource(R.drawable.image_placeholder),
+                contentDescription = "Upload Image",
+                tint = Color.Gray,
+                modifier = Modifier.size(48.dp)
+            )
+            Text(text = "Картинка", color = Color.Gray, fontSize = 14.sp)
+        }
+    }
+}
+
+@Composable
+private fun WordInputSection() {
+    OutlinedTextField(
+        value = "", // Здесь можно добавить состояние
+        onValueChange = {},
+        label = { Text("Слово") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colorResource(R.color.grey_graph)),
+        trailingIcon = {
+            Row {
+                IconButton(onClick = {}) {
+                    Icon(painterResource(R.drawable.volium), contentDescription = "Play Sound")
+                }
+                IconButton(onClick = {}) {
+                    Icon(painterResource(R.drawable.close_icon), contentDescription = "Clear")
+                }
+            }
+        },
+    )
+}
+
+@Composable
+private fun TranslationSection() {
+    Column {
+        OutlinedTextField(
+            value = "", // Здесь можно добавить состояние
+            onValueChange = {},
+            label = { Text("Добавить свой перевод") },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                IconButton(onClick = {}) {
+                    Icon(painterResource(R.drawable.close_icon), contentDescription = "Clear")
+                }
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colorResource(R.color.grey_graph), RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        ) {
+            Text(
+                text = "Слово [транскрипция] сущ\n1 перевод",
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+        }
+    }
+}
+
+@Composable
+private fun ExampleUsageSection() {
+    Column {
+        OutlinedTextField(
+            value = "", // Здесь можно добавить состояние
+            onValueChange = {},
+            label = { Text("Добавить свой пример") },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                IconButton(onClick = {}) {
+                    Icon(painterResource(R.drawable.close_icon), contentDescription = "Clear")
+                }
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Примеры использования",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.Black
+        )
+    }
+}
 
 @Composable
 @Preview(showSystemUi = true)

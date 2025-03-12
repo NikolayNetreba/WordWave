@@ -39,5 +39,6 @@ fun AllApp() {
     NavHost(navController = navController, startDestination = "home_screen"){
         composable("home_screen") { HomePageScreen(navController) }
         composable("vocabulary_screen") { VocabularyScreen(navController) }
+        composable("add_word_screen") { AddWordScreen(navController)}
     }
 }

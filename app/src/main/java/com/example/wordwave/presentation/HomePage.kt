@@ -29,6 +29,7 @@ fun HomePageScreen(navController: NavHostController) {
         topBar = { Bar() },
         bottomBar = { NavigationBar{
             navController.navigate("home_screen")
+            //navController.navigate("add_word_screen")
         } },
         content = { padding ->
             Column(
@@ -146,7 +147,7 @@ fun GamesTable() {
 }
 
 @Composable
-fun NavigationBar(onClick: () -> Unit) {
+fun NavigationBar(navController: NavHostController) {
     Column(
         modifier = Modifier.statusBarsPadding()
     ) {
@@ -159,13 +160,13 @@ fun NavigationBar(onClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick) {
+            IconButton(onClick = {navController.navigate("home_screen")}) {
                 Icon(
                     painterResource(R.drawable.home_ic),
                     contentDescription = "Home"
                 )
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = {navController.navigate("add_word_screen")}) {
                 Icon(
                     painterResource(R.drawable.add_button),
                     contentDescription = "Add"
