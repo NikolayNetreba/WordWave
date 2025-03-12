@@ -99,7 +99,7 @@ private fun Bar(title: String) {
             onClick = { Toast.makeText(context, "HI", Toast.LENGTH_SHORT).show() },
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(dimensionResource(R.dimen.padding_10))
+                .padding(start = dimensionResource(R.dimen.padding_10))
         ) {
             Image(
                 painter = painterResource(R.drawable.profile_icon),
