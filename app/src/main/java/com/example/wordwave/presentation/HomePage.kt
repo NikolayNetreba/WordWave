@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
@@ -27,10 +28,7 @@ import com.example.wordwave.R
 fun HomePageScreen(navController: NavHostController) {
     Scaffold(
         topBar = { Bar() },
-        bottomBar = { NavigationBar{
-            navController.navigate("home_screen")
-            //navController.navigate("add_word_screen")
-        } },
+        bottomBar = { NavigationBar(navController)},
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -38,9 +36,7 @@ fun HomePageScreen(navController: NavHostController) {
                     .padding(padding)
                     .background(Color.White)
             ) {
-                AllWordButton{
-                    navController.navigate("vocabulary_screen")
-                }
+                AllWordButton(navController)
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
                 Diagrams()
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
@@ -87,7 +83,7 @@ private fun Bar() {
 
 
 @Composable
-fun AllWordButton(onClick: () -> Unit) {
+fun AllWordButton(navController: NavHostController) {
     Box(
         modifier = Modifier
             .padding(16.dp)
@@ -95,7 +91,7 @@ fun AllWordButton(onClick: () -> Unit) {
             .height(45.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(colorResource(R.color.grey_graph))
-            .clickable { onClick() }
+            .clickable { navController.navigate("vocabulary_screen")}
     ) {
         Text(
             text = stringResource(R.string.all_word),

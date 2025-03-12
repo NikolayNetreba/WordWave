@@ -1,18 +1,28 @@
 package com.example.wordwave.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,11 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 
 @Composable
-fun AddWordScreen(navController: NavController) {
+fun AddWordScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             Column {
@@ -38,9 +49,7 @@ fun AddWordScreen(navController: NavController) {
             }
         },
         bottomBar = {
-            NavigationBar {
-                navController.navigate("home_screen")
-            }
+            NavigationBar(navController)
         },
         containerColor = Color.White,
         content = { padding ->
@@ -142,19 +151,19 @@ private fun ImageUploadSection() {
 @Composable
 private fun WordInputSection() {
     OutlinedTextField(
-        value = "", // Здесь можно добавить состояние
+        value = "",
         onValueChange = {},
         label = { Text("Слово") },
         modifier = Modifier
             .fillMaxWidth()
             .background(colorResource(R.color.grey_graph)),
         trailingIcon = {
-            Row {
+            Row{
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.volium), contentDescription = "Play Sound")
+                    Icon(painterResource(R.drawable.volium), tint = Color.Black, contentDescription = "Play Sound")
                 }
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), contentDescription = "Clear")
+                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
                 }
             }
         },
@@ -165,13 +174,13 @@ private fun WordInputSection() {
 private fun TranslationSection() {
     Column {
         OutlinedTextField(
-            value = "", // Здесь можно добавить состояние
+            value = "",
             onValueChange = {},
             label = { Text("Добавить свой перевод") },
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), contentDescription = "Clear")
+                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
                 }
             }
         )
@@ -195,13 +204,13 @@ private fun TranslationSection() {
 private fun ExampleUsageSection() {
     Column {
         OutlinedTextField(
-            value = "", // Здесь можно добавить состояние
+            value = "",
             onValueChange = {},
             label = { Text("Добавить свой пример") },
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), contentDescription = "Clear")
+                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
                 }
             }
         )

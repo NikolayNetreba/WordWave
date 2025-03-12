@@ -23,12 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 
 
 @Composable
-fun VocabularyScreen(navController: NavController) {
+fun VocabularyScreen(navController: NavHostController) {
     val words: List<Pair<String, String>> = listOf(
         "hi" to "Привет",
         "bye" to "Пока",
@@ -47,9 +48,7 @@ fun VocabularyScreen(navController: NavController) {
             }
         },
         bottomBar = {
-            NavigationBar {
-                navController.navigate("home_screen")
-            }
+            NavigationBar(navController)
         },
         containerColor = Color.White,
         content = { padding ->
