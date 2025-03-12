@@ -1,4 +1,4 @@
-package com.example.wordwave.ui.theme
+package com.example.wordwave.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,4 +1,4 @@
-package com.example.wordwave.ui.theme
+package com.example.wordwave.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
