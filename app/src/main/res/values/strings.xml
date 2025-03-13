@@ -5,4 +5,6 @@
     <string name="game_table_title">Упражнения</string>
     <string name="vocabulary_title">Словарь</string>
     <string name="add_word_title">Новое слово</string>
+    <string name="translation_history">История перевода\n</string>
+    <string name="enter_text">Введите текст</string>
 </resources>

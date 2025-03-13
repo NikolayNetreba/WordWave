@@ -44,7 +44,7 @@ fun AddWordScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             Column {
-                TopBar()
+                TopBar(navController)
                 HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.line))
             }
         },
@@ -68,7 +68,7 @@ fun AddWordScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar() {
+private fun TopBar(navController: NavHostController) {
     TopAppBar(
         title = {
             Box(
@@ -84,7 +84,7 @@ private fun TopBar() {
             }
         },
         navigationIcon = {
-            IconButton(onClick = {}, modifier = Modifier.padding(horizontal = 2.dp)) {
+            IconButton(onClick = {navController.popBackStack()}, modifier = Modifier.padding(horizontal = 2.dp)) {
                 Icon(
                     painterResource(R.drawable.backbutton),
                     contentDescription = "back",
@@ -93,7 +93,7 @@ private fun TopBar() {
             }
         },
         actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = {navController.popBackStack()}) {
                 Icon(
                     painterResource(R.drawable.tick),
                     contentDescription = "add",
@@ -226,7 +226,7 @@ private fun ExampleUsageSection() {
 
 @Composable
 @Preview(showSystemUi = true)
-fun PreviewAddWord() {
+private fun PreviewAddWord() {
     val navController = rememberNavController()
     AddWordScreen(navController)
 }
