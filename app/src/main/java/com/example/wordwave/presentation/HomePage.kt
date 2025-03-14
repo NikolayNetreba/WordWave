@@ -27,7 +27,7 @@ import com.example.wordwave.R
 @Composable
 fun HomePageScreen(navController: NavHostController) {
     Scaffold(
-        topBar = { Bar() },
+        topBar = { TopBar(navController) },
         bottomBar = { NavigationBar(navController)},
         content = { padding ->
             Column(
@@ -47,38 +47,32 @@ fun HomePageScreen(navController: NavHostController) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Bar() {
-    val context = LocalContext.current
+private fun TopBar(navController: NavHostController) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.bar_title),
+                fontSize = dimensionResource(R.dimen.title_size).value.sp,
+                fontWeight = FontWeight.SemiBold,
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(R.color.bar))
-            .statusBarsPadding()
-    ) {
-        Text(
-            text = stringResource(R.string.bar_title),
-            fontSize = dimensionResource(R.dimen.title_size).value.sp,
-            modifier = Modifier.align(Alignment.Center),
-            fontWeight = FontWeight.SemiBold,
-            color = Color.White
-        )
-
-        IconButton(
-            onClick = { Toast.makeText(context, "HI", Toast.LENGTH_SHORT).show() },
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(vertical = 8.dp, horizontal = 6.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.profile_icon),
-                contentDescription = "icon",
-                tint = Color.White
             )
-        }
-    }
-
+        },
+        navigationIcon = {
+            IconButton(onClick = {}, modifier = Modifier.padding(horizontal = 2.dp)) {
+                Icon(
+                    painterResource(R.drawable.profile_icon),
+                    contentDescription = "profile_icon",
+                    tint = Color.White
+                )
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = colorResource(R.color.bar),
+            titleContentColor = Color.White
+        )
+    )
 }
 
 
@@ -168,7 +162,7 @@ fun NavigationBar(navController: NavHostController) {
                     contentDescription = "Add"
                 )
             }
-            IconButton(onClick = {}) {
+            IconButton(onClick = {navController.navigate("translate_screen")}) {
                 Icon(
                     painterResource(R.drawable.translate_ic),
                     contentDescription = "Translate"

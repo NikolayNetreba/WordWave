@@ -40,5 +40,6 @@ fun AllApp() {
         composable("home_screen") { HomePageScreen(navController) }
         composable("vocabulary_screen") { VocabularyScreen(navController) }
         composable("add_word_screen") { AddWordScreen(navController)}
+        composable("translate_screen") { TranslateScreen(navController)}
     }
 }

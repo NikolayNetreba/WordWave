@@ -43,10 +43,7 @@ import com.example.wordwave.R
 fun AddWordScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
-            Column {
-                TopBar(navController)
-                HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.line))
-            }
+            TopBar(navController)
         },
         bottomBar = {
             NavigationBar(navController)
@@ -78,7 +75,7 @@ private fun TopBar(navController: NavHostController) {
                     text = stringResource(R.string.add_word_title),
                     fontSize = dimensionResource(R.dimen.title_size).value.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.Black,
+                    color = Color.White,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -88,7 +85,7 @@ private fun TopBar(navController: NavHostController) {
                 Icon(
                     painterResource(R.drawable.backbutton),
                     contentDescription = "back",
-                    tint = Color.Black
+                    tint = Color.White
                 )
             }
         },
@@ -97,12 +94,12 @@ private fun TopBar(navController: NavHostController) {
                 Icon(
                     painterResource(R.drawable.tick),
                     contentDescription = "add",
-                    tint = Color.Black
+                    tint = Color.White
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White
+            containerColor = colorResource(R.color.bar)
         )
     )
 }

@@ -3,6 +3,7 @@ package com.example.wordwave.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.content.contentReceiver
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,10 +42,19 @@ fun TranslateScreen(navController: NavHostController) {
                 modifier = Modifier
                     .padding(paddingValues)
                     .padding(horizontal = 16.dp)
+                    .padding(top = 10.dp)
             ) {
-                LanguageSelector()
-                InputField()
-                TranslationHistory(modifier = Modifier.padding(top = 24.dp))
+                Box(
+                    modifier = Modifier.background(colorResource(id = R.color.grey_graph), shape = RoundedCornerShape(12.dp))
+                ) {
+                    Column {
+                        LanguageSelector()
+                        HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.line))
+                        TranslateInputField()
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                TranslationHistory()
             }
         }
     )
@@ -52,43 +63,30 @@ fun TranslateScreen(navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(navController: NavHostController) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
-            Box(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(R.string.add_word_title),
-                    fontSize = dimensionResource(R.dimen.title_size).value.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
+            Text(
+                text = stringResource(R.string.translate_title),
+                fontSize = dimensionResource(R.dimen.title_size).value.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
         },
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.padding(horizontal = 2.dp)) {
+            IconButton(onClick = {}, modifier = Modifier.padding(horizontal = 2.dp)) {
                 Icon(
-                    painterResource(R.drawable.backbutton),
-                    contentDescription = "back",
-                    tint = Color.Black
+                    painterResource(R.drawable.profile_icon),
+                    contentDescription = "profile_icon",
+                    tint = Color.White
                 )
             }
         },
-        actions = {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    painterResource(R.drawable.tick),
-                    contentDescription = "user",
-                    tint = Color.Black
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = colorResource(R.color.bar)
         )
     )
 }
+
 
 @Composable
 private fun LanguageSelector() {
@@ -103,16 +101,21 @@ private fun LanguageSelector() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Button(
-            onClick = { /* TODO: Implement language selection logic */ },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Black),
+            onClick = { },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Black
+            ),
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = sourceLanguage,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.SemiBold,
                 color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
             )
         }
 
@@ -132,64 +135,126 @@ private fun LanguageSelector() {
         }
 
         Button(
-            onClick = { /* TODO: Implement language selection logic */ },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Black),
+            onClick = { },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Black
+            ),
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = targetLanguage,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.SemiBold,
                 color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Clip,
             )
         }
     }
 }
 
 @Composable
-private fun InputField() {
-    Box(
+fun TranslateInputField() {
+    var inputText by remember { mutableStateOf("") }
+    var translatedText by remember { mutableStateOf("") }
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .padding(vertical = 8.dp)
-            .background(colorResource(id = R.color.grey_graph), shape = RoundedCornerShape(8.dp))
-
+            .padding(16.dp)
+            .background(color = colorResource(R.color.grey_graph), shape = RoundedCornerShape(12.dp))
+            .padding(16.dp)
     ) {
-        Text(
-            text = stringResource(id = R.string.enter_text),
-            fontSize = 16.sp,
-            color = Color.Gray,
-            modifier = Modifier
-                .padding(8.dp)
-        )
+        // Поле ввода текста
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = inputText,
+                onValueChange = { inputText = it },
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.enter_text),
+                    )
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp),
+                singleLine = true,
+            )
+
+
+            // Кнопка очистки текста (крестик)
+            if (inputText.isNotEmpty()) {
+                IconButton(onClick = { inputText = "" }) {
+                    Icon(
+                        painterResource(R.drawable.close_icon),
+                        contentDescription = "Clear text",
+                        tint = Color.Black
+                    )
+                }
+            }
+
+            // Кнопка прослушивания текста
+            IconButton(onClick = { /* Реализуйте функционал прослушивания */ }) {
+                Icon(
+                    painterResource(id = R.drawable.volium),
+                    contentDescription = "Play text",
+                    tint = Color.Black
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Поле отображения перевода
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = translatedText,
+                fontSize = 16.sp,
+                color = Color.Black,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Кнопка прослушивания перевода
+            IconButton(onClick = { /* Реализуйте функционал прослушивания перевода */ }) {
+                Icon(
+                    painterResource(id = R.drawable.volium),
+                    contentDescription = "Play translation",
+                    tint = Color.Black
+                )
+            }
+        }
     }
 }
 
+
 @Composable
-private fun TranslationHistory(modifier: Modifier) {
-    Column(modifier = modifier.fillMaxWidth()) {
+private fun TranslationHistory() {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = stringResource(R.string.translation_history),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.Black,
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
-            Spacer(modifier = Modifier.weight(1f))
             Icon(
                 painterResource(id = R.drawable.arrow_down),
                 contentDescription = "Show More",
                 tint = Color.Black,
-                modifier = Modifier.clickable {
-                    /* TODO: Implement show more logic */
-                }
             )
         }
         LazyColumn {
@@ -208,9 +273,9 @@ private fun TranslationHistoryItem(wordPair: Pair<String, String>) {
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .background(colorResource(id = R.color.grey_graph), shape = RoundedCornerShape(8.dp))
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
-        Column (
+        Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(
