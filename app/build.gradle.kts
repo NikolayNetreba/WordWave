@@ -1,7 +1,8 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.relay)
+    alias(libs.plugins.android.application) version "8.8.0-alpha05"
+    alias(libs.plugins.kotlin.android) version "2.1.10"
+    id("com.google.devtools.ksp") version "2.1.10-1.0.31"
+    alias(libs.plugins.kotlin.compose) version "2.1.10"
 }
 
 android {
@@ -70,5 +71,34 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    val roomVersion = "2.6.1"
+
+    implementation ("androidx.room:room-runtime:${roomVersion}")
+
+    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+    // See KSP Quickstart to add KSP to your build
+    ksp ("androidx.room:room-compiler:${roomVersion}")
+
+    // If this project only uses Java source, use the Java annotationProcessor
+    // No additional plugins are necessary
+    annotationProcessor ("androidx.room:room-compiler:${roomVersion}")
+
+    // optional - RxJava2 support for Room
+    implementation ("androidx.room:room-rxjava2:${roomVersion}")
+
+    // optional - RxJava3 support for Room
+    implementation ("androidx.room:room-rxjava3:${roomVersion}")
+
+    // optional - Guava support for Room, including Optional and ListenableFuture
+    implementation ("androidx.room:room-guava:${roomVersion}")
+
+    // optional - Test helpers
+    testImplementation ("androidx.room:room-testing:${roomVersion}")
+
+    // optional - Paging 3 Integration
+    implementation ("androidx.room:room-paging:${roomVersion}")
+
+    implementation ("androidx.room:room-ktx:${roomVersion}")
 
 }

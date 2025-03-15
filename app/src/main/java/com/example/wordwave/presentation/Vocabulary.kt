@@ -38,6 +38,8 @@ fun VocabularyScreen(navController: NavHostController) {
         "cat" to "Кот"
     )
 
+
+
     val categories = listOf("Все", "Изучаемые", "Выученные", "Фразы", "Слова")
 
     Scaffold(
