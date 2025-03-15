@@ -6,13 +6,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.content.contentReceiver
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -28,6 +31,12 @@ import com.example.wordwave.R
 
 @Composable
 fun TranslateScreen(navController: NavHostController) {
+    val (inputText, setInputText) = remember { mutableStateOf("") }
+    val (additionalTranslations, setAdditionalTranslations) = remember {
+        mutableStateOf(listOf("Перевод 1", "Перевод 2", "Перевод 3"))
+    }
+    val showHistory = inputText.isEmpty()
+
     Scaffold(
         topBar = {
             Column {
@@ -45,16 +54,29 @@ fun TranslateScreen(navController: NavHostController) {
                     .padding(top = 10.dp)
             ) {
                 Box(
-                    modifier = Modifier.background(colorResource(id = R.color.grey_graph), shape = RoundedCornerShape(12.dp))
+                    modifier = Modifier.background(
+                        colorResource(id = R.color.grey_graph),
+                        shape = RoundedCornerShape(12.dp)
+                    )
                 ) {
                     Column {
                         LanguageSelector()
                         HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.line))
-                        TranslateInputField()
+                        TranslateInputField(inputText = inputText, setInputText = setInputText, navController = navController)
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                TranslationHistory()
+
+                // Показать историю перевода, если нет текста
+                if (showHistory) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TranslationHistory()
+                }
+
+                // Показать дополнительные переводы, если есть введенный текст
+                if (inputText.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    AdditionalTranslations(translations = additionalTranslations)
+                }
             }
         }
     )
@@ -106,7 +128,6 @@ private fun LanguageSelector() {
                 containerColor = Color.Transparent,
                 contentColor = Color.Black
             ),
-            contentPadding = PaddingValues(0.dp),
             modifier = Modifier.weight(1f)
         ) {
             Text(
@@ -156,81 +177,161 @@ private fun LanguageSelector() {
 }
 
 @Composable
-fun TranslateInputField() {
-    var inputText by remember { mutableStateOf("") }
-    var translatedText by remember { mutableStateOf("") }
+fun TranslateInputField(inputText: String, setInputText: (String) -> Unit, navController: NavHostController) {
+    var localInputText by remember { mutableStateOf(inputText) }
 
-    Column(
+    // Изменение размера шрифта в зависимости от длины текста
+    val linesCount = localInputText.length / 15
+    val fontSize = when {
+        linesCount < 3 -> 18.sp
+        linesCount in 3..6 -> 16.sp
+        linesCount in 7..9 -> 14.sp
+        else -> 12.sp
+    }
+
+    // Создаем ScrollState для вертикальной прокрутки
+    val scrollState = rememberScrollState()
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .background(color = colorResource(R.color.grey_graph), shape = RoundedCornerShape(12.dp))
-            .padding(16.dp)
+            .background(colorResource(R.color.grey_graph), shape = RoundedCornerShape(12.dp))
+            .heightIn(max = 500.dp)
     ) {
-        // Поле ввода текста
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = inputText,
-                onValueChange = { inputText = it },
-                placeholder = {
-                    Text(
-                        text = stringResource(R.string.enter_text),
-                    )
-                },
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Поле ввода с прокруткой
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .padding(horizontal = 8.dp),
-                singleLine = true,
-            )
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .heightIn(min = 50.dp, max = 150.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    TextField(
+                        value = localInputText,
+                        onValueChange = {
+                            localInputText = it
+                            setInputText(it) // Обновляем родительский state
+                        },
+                        placeholder = {
+                            Text(text = "Введите текст")
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Gray,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            cursorColor = Color.Black,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        textStyle = LocalTextStyle.current.copy(fontSize = fontSize),
+                        singleLine = false
+                    )
+                }
 
+                // Крестик для очистки текста
+                if (localInputText.isNotEmpty()) {
+                    IconButton(
+                        onClick = { localInputText = ""; setInputText("") },
+                        modifier = Modifier.align(Alignment.Top)
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.add_2_24),
+                            contentDescription = "Clear text",
+                            tint = Color.Black,
+                            modifier = Modifier.graphicsLayer(rotationZ = 45f)
+                        )
+                    }
+                }
+            }
 
-            // Кнопка очистки текста (крестик)
-            if (inputText.isNotEmpty()) {
-                IconButton(onClick = { inputText = "" }) {
+            // Иконка для прослушивания и добавления
+            if (localInputText.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { /* Прослушивание */ }) {
+                        Icon(
+                            painterResource(id = R.drawable.volium),
+                            contentDescription = "Play text",
+                            tint = Color.Black
+                        )
+                    }
+                    IconButton(onClick = { navController.navigate("add_word_screen") }) {
+                        Icon(
+                            painterResource(id = R.drawable.add_2_24),
+                            contentDescription = "add",
+                            tint = Color.Black
+                        )
+                    }
+                }
+
+                // Разделяющая черта
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    thickness = 1.dp,
+                    color = colorResource(R.color.line)
+                )
+
+                // Основной перевод с возможностью прокрутки
+                Box(
+                    modifier = Modifier.heightIn(max = 150.dp).fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)  // Немного отступов
+                            .verticalScroll(scrollState)
+                    ) {
+                        Text(
+                            text = localInputText,
+                            fontSize = fontSize,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)  // Отступы
+                                .fillMaxWidth()  // Ширина, чтобы текст был по всей ширине
+                        )
+                    }
+                }
+
+                // Иконка для прослушивания перевода
+                IconButton(onClick = { /* Прослушивание */ }) {
                     Icon(
-                        painterResource(R.drawable.close_icon),
-                        contentDescription = "Clear text",
+                        painterResource(id = R.drawable.volium),
+                        contentDescription = "Play text",
                         tint = Color.Black
                     )
                 }
             }
-
-            // Кнопка прослушивания текста
-            IconButton(onClick = { /* Реализуйте функционал прослушивания */ }) {
-                Icon(
-                    painterResource(id = R.drawable.volium),
-                    contentDescription = "Play text",
-                    tint = Color.Black
-                )
-            }
         }
+    }
 
-        Spacer(modifier = Modifier.height(8.dp))
+    // Прокручиваем вниз, если был введен новый текст
+    LaunchedEffect(localInputText) {
+        // Прокручиваем вниз при изменении текста
+        scrollState.animateScrollTo(scrollState.maxValue)
+    }
+}
 
-        // Поле отображения перевода
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+@Composable
+fun AdditionalTranslations(translations: List<String>) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        translations.forEach { translation ->
             Text(
-                text = translatedText,
+                text = translation,
                 fontSize = 16.sp,
                 color = Color.Black,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
             )
-
-            // Кнопка прослушивания перевода
-            IconButton(onClick = { /* Реализуйте функционал прослушивания перевода */ }) {
-                Icon(
-                    painterResource(id = R.drawable.volium),
-                    contentDescription = "Play translation",
-                    tint = Color.Black
-                )
-            }
         }
     }
 }
