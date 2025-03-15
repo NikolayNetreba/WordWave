@@ -149,7 +149,8 @@ private fun ImageUploadSection() {
 private fun WordInputSection() {
     OutlinedTextField(
         value = "",
-        onValueChange = {},
+        onValueChange = {
+        },
         label = { Text("Слово") },
         modifier = Modifier
             .fillMaxWidth()

@@ -39,3 +39,4 @@ androidx-benchmark-macro = { group = "androidx.benchmark", name = "benchmark-mac
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 relay = { id = 'com.google.relay', version = '0.3.12'}
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
