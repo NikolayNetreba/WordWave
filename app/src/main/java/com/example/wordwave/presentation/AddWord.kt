@@ -20,9 +20,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +47,7 @@ import com.example.wordwave.R
 
 @Composable
 fun AddWordScreen(navController: NavHostController) {
+    val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
             TopBar(navController)
@@ -57,7 +64,22 @@ fun AddWordScreen(navController: NavHostController) {
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                Content()
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                        .padding(dimensionResource(R.dimen.padding_15))
+                ) {
+                    item {
+                        ImageUploadSection()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        WordInputSection(inputText = inputText, setInputText = setInputText)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TranslationSection()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ExampleUsageSection()
+                    }
+                }
             }
         }
     )
@@ -81,7 +103,10 @@ private fun TopBar(navController: NavHostController) {
             }
         },
         navigationIcon = {
-            IconButton(onClick = {navController.popBackStack()}, modifier = Modifier.padding(horizontal = 2.dp)) {
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.padding(horizontal = 2.dp)
+            ) {
                 Icon(
                     painterResource(R.drawable.backbutton),
                     contentDescription = "back",
@@ -90,7 +115,7 @@ private fun TopBar(navController: NavHostController) {
             }
         },
         actions = {
-            IconButton(onClick = {navController.popBackStack()}) {
+            IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     painterResource(R.drawable.tick),
                     contentDescription = "add",
@@ -102,26 +127,6 @@ private fun TopBar(navController: NavHostController) {
             containerColor = colorResource(R.color.bar)
         )
     )
-}
-
-@Composable
-private fun Content() {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(dimensionResource(R.dimen.padding_15))
-    ) {
-        item {
-            ImageUploadSection()
-            Spacer(modifier = Modifier.height(16.dp))
-            WordInputSection()
-            Spacer(modifier = Modifier.height(16.dp))
-            TranslationSection()
-            Spacer(modifier = Modifier.height(16.dp))
-            ExampleUsageSection()
-        }
-    }
 }
 
 @Composable
@@ -146,22 +151,40 @@ private fun ImageUploadSection() {
 }
 
 @Composable
-private fun WordInputSection() {
-    OutlinedTextField(
-        value = "",
+private fun WordInputSection(inputText: String, setInputText: (String) -> Unit) {
+    var localInputText by remember { mutableStateOf(inputText) }
+    TextField(
+        value = localInputText,
         onValueChange = {
+            localInputText = it
+            setInputText(it) // Обновляем родительский state
         },
         label = { Text("Слово") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(R.color.grey_graph)),
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Gray,
+            focusedContainerColor = colorResource(R.color.grey_graph),
+            unfocusedContainerColor = colorResource(R.color.grey_graph),
+            cursorColor = Color.Black,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
         trailingIcon = {
-            Row{
+            Row {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.volium), tint = Color.Black, contentDescription = "Play Sound")
+                    Icon(
+                        painterResource(R.drawable.volium),
+                        tint = Color.Black,
+                        contentDescription = "Play Sound"
+                    )
                 }
-                IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
+                IconButton(onClick = { localInputText = ""; setInputText("") }) {
+                    Icon(
+                        painterResource(R.drawable.close_icon),
+                        tint = Color.Black,
+                        contentDescription = "Clear"
+                    )
                 }
             }
         },
@@ -171,14 +194,27 @@ private fun WordInputSection() {
 @Composable
 private fun TranslationSection() {
     Column {
-        OutlinedTextField(
+        TextField(
             value = "",
             onValueChange = {},
             label = { Text("Добавить свой перевод") },
             modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Gray,
+                focusedContainerColor = colorResource(R.color.grey_graph),
+                unfocusedContainerColor = colorResource(R.color.grey_graph),
+                cursorColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
             trailingIcon = {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
+                    Icon(
+                        painterResource(R.drawable.close_icon),
+                        tint = Color.Black,
+                        contentDescription = "Clear"
+                    )
                 }
             }
         )
@@ -201,14 +237,27 @@ private fun TranslationSection() {
 @Composable
 private fun ExampleUsageSection() {
     Column {
-        OutlinedTextField(
+        TextField(
             value = "",
             onValueChange = {},
             label = { Text("Добавить свой пример") },
             modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Gray,
+                focusedContainerColor = colorResource(R.color.grey_graph),
+                unfocusedContainerColor = colorResource(R.color.grey_graph),
+                cursorColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
             trailingIcon = {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
+                    Icon(
+                        painterResource(R.drawable.close_icon),
+                        tint = Color.Black,
+                        contentDescription = "Clear"
+                    )
                 }
             }
         )

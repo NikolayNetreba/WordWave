@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application) version "8.8.0-alpha05"
+    alias(libs.plugins.android.application) version "8.10.0-alpha07"
     alias(libs.plugins.kotlin.android) version "2.1.10"
     id("com.google.devtools.ksp") version "2.1.10-1.0.31"
     alias(libs.plugins.kotlin.compose) version "2.1.10"
@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.translate)
     implementation (libs.androidx.foundation)
     implementation(libs.google.accompanist.systemuicontroller)
     implementation(libs.androidx.navigation.compose)
@@ -71,34 +72,36 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     val roomVersion = "2.6.1"
 
-    implementation ("androidx.room:room-runtime:${roomVersion}")
+    implementation (libs.androidx.room.runtime)
 
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See KSP Quickstart to add KSP to your build
-    ksp ("androidx.room:room-compiler:${roomVersion}")
+    ksp (libs.androidx.room.compiler)
 
     // If this project only uses Java source, use the Java annotationProcessor
     // No additional plugins are necessary
-    annotationProcessor ("androidx.room:room-compiler:${roomVersion}")
+    annotationProcessor (libs.androidx.room.compiler)
 
     // optional - RxJava2 support for Room
-    implementation ("androidx.room:room-rxjava2:${roomVersion}")
+    implementation (libs.androidx.room.rxjava2)
 
     // optional - RxJava3 support for Room
-    implementation ("androidx.room:room-rxjava3:${roomVersion}")
+    implementation (libs.androidx.room.rxjava3)
 
     // optional - Guava support for Room, including Optional and ListenableFuture
-    implementation ("androidx.room:room-guava:${roomVersion}")
+    implementation (libs.androidx.room.guava)
 
     // optional - Test helpers
-    testImplementation ("androidx.room:room-testing:${roomVersion}")
+    testImplementation (libs.androidx.room.testing)
 
     // optional - Paging 3 Integration
-    implementation ("androidx.room:room-paging:${roomVersion}")
+    implementation (libs.androidx.room.paging)
 
-    implementation ("androidx.room:room-ktx:${roomVersion}")
+    implementation (libs.androidx.room.ktx)
 
 }
