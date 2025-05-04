@@ -74,6 +74,25 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+
+    val roomVersion = "2.6.1"
+
+    implementation (libs.androidx.room.runtime)
+
+    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+    // See KSP Quickstart to add KSP to your build
+    ksp (libs.androidx.room.compiler)
+
+    // If this project only uses Java source, use the Java annotationProcessor
+    // No additional plugins are necessary
+    annotationProcessor (libs.androidx.room.compiler)
+
+    // optional - RxJava2 support for Room
+    implementation (libs.androidx.room.rxjava2)
+
+    // optional - RxJava3 support for Room
+
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx.v262)
     implementation(libs.kotlinx.coroutines.android)
@@ -99,6 +118,7 @@ dependencies {
     ksp (libs.androidx.room.compiler)
     annotationProcessor (libs.androidx.room.compiler)
     implementation (libs.androidx.room.rxjava2)
+
     implementation (libs.androidx.room.rxjava3)
 
     // optional - Guava support for Room, including Optional and ListenableFuture

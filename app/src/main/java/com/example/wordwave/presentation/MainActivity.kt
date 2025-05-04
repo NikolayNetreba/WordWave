@@ -1,5 +1,6 @@
 package com.example.wordwave.presentation
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.LibreTranslateApi
 import com.example.wordwave.R
+import com.example.wordwave.presentation.db.DictionaryViewModel
 import com.example.wordwave.TranslationViewModel
 import com.example.wordwave.presentation.ui.theme.WordWaveTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -22,21 +24,24 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
-    private val viewModel: TranslationViewModel by viewModels()
+    private val DviewModel: DictionaryViewModel by viewModels()
+    private val TviewModel: TranslationViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             WordWaveTheme {
-                val viewModel: TranslationViewModel = viewModel()
-                AllApp(viewModel)
+                AllApp(DviewModel, TviewModel)
             }
         }
     }
 }
 
 @Composable
-fun AllApp(viewModel: TranslationViewModel) {
+
+fun AllApp(DviewModel: DictionaryViewModel, TviewModel: TranslationViewModel) {
+
     val navController = rememberNavController()
     val color = colorResource(R.color.bar)
     val systemUiController = rememberSystemUiController()
@@ -49,7 +54,7 @@ fun AllApp(viewModel: TranslationViewModel) {
     NavHost(navController = navController, startDestination = "home_screen") {
         composable("home_screen") { HomePageScreen(navController) }
         composable("vocabulary_screen") { VocabularyScreen(navController) }
-        composable("add_word_screen") { AddWordScreen(navController) }
-        composable("translate_screen") { TranslateScreen(navController, viewModel) }
+        composable("add_word_screen") { AddWordScreen(navController, DviewModel) }
+        composable("translate_screen") { TranslateScreen(navController, TviewModel) }
     }
 }
