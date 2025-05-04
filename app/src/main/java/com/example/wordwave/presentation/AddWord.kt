@@ -100,6 +100,7 @@ private fun TopBar(navController: NavHostController, viewModel: DictionaryViewMo
                         viewModel.addSampleData()
                     })
             {
+
                 Icon(
                     painterResource(R.drawable.tick),
                     contentDescription = "add",

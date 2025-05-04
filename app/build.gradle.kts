@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application) version "8.8.0-alpha05"
+    alias(libs.plugins.android.application) version "8.10.0-alpha07"
     alias(libs.plugins.kotlin.android) version "2.1.10"
     id("com.google.devtools.ksp") version "2.1.10-1.0.31"
     alias(libs.plugins.kotlin.compose) version "2.1.10"
@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
+
     val roomVersion = "2.6.1"
 
     implementation (libs.androidx.room.runtime)
@@ -91,6 +92,33 @@ dependencies {
     implementation (libs.androidx.room.rxjava2)
 
     // optional - RxJava3 support for Room
+
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v262)
+    implementation(libs.kotlinx.coroutines.android)
+
+    implementation (libs.ktor.client.core)
+    implementation (libs.ktor.client.cio)
+    implementation (libs.ktor.client.content.negotiation)
+    implementation (libs.ktor.serialization.gson)
+    implementation (libs.ktor.client.logging)
+
+    // Coroutines
+    implementation (libs.kotlinx.coroutines.core)
+    implementation (libs.kotlinx.coroutines.android)
+
+    // Lifecycle
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    implementation (libs.androidx.lifecycle.runtime.ktx)
+
+    // Gson
+    implementation (libs.gson)
+
+    implementation (libs.androidx.room.runtime)
+    ksp (libs.androidx.room.compiler)
+    annotationProcessor (libs.androidx.room.compiler)
+    implementation (libs.androidx.room.rxjava2)
+
     implementation (libs.androidx.room.rxjava3)
 
     // optional - Guava support for Room, including Optional and ListenableFuture
