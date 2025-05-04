@@ -1,28 +1,11 @@
 package com.example.wordwave.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,16 +17,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
+import com.example.wordwave.presentation.db.DictionaryViewModel
 
 @Composable
-fun AddWordScreen(navController: NavHostController) {
+fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewModel) {
+    val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
-            TopBar(navController)
+            TopBar(navController, viewModel)
         },
         bottomBar = {
             NavigationBar(navController)
@@ -57,7 +41,22 @@ fun AddWordScreen(navController: NavHostController) {
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                Content()
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                        .padding(dimensionResource(R.dimen.padding_15))
+                ) {
+                    item {
+                        ImageUploadSection()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        WordInputSection(inputText = inputText, setInputText = setInputText)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TranslationSection()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ExampleUsageSection()
+                    }
+                }
             }
         }
     )
@@ -65,7 +64,9 @@ fun AddWordScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController) {
+private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
+    val scope = rememberCoroutineScope()
+
     TopAppBar(
         title = {
             Box(
@@ -81,7 +82,10 @@ private fun TopBar(navController: NavHostController) {
             }
         },
         navigationIcon = {
-            IconButton(onClick = {navController.popBackStack()}, modifier = Modifier.padding(horizontal = 2.dp)) {
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.padding(horizontal = 2.dp)
+            ) {
                 Icon(
                     painterResource(R.drawable.backbutton),
                     contentDescription = "back",
@@ -90,7 +94,12 @@ private fun TopBar(navController: NavHostController) {
             }
         },
         actions = {
-            IconButton(onClick = {navController.popBackStack()}) {
+            IconButton(
+                onClick =
+                    {
+                        viewModel.addSampleData()
+                    })
+            {
                 Icon(
                     painterResource(R.drawable.tick),
                     contentDescription = "add",
@@ -102,26 +111,6 @@ private fun TopBar(navController: NavHostController) {
             containerColor = colorResource(R.color.bar)
         )
     )
-}
-
-@Composable
-private fun Content() {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(dimensionResource(R.dimen.padding_15))
-    ) {
-        item {
-            ImageUploadSection()
-            Spacer(modifier = Modifier.height(16.dp))
-            WordInputSection()
-            Spacer(modifier = Modifier.height(16.dp))
-            TranslationSection()
-            Spacer(modifier = Modifier.height(16.dp))
-            ExampleUsageSection()
-        }
-    }
 }
 
 @Composable
@@ -146,22 +135,40 @@ private fun ImageUploadSection() {
 }
 
 @Composable
-private fun WordInputSection() {
-    OutlinedTextField(
-        value = "",
+private fun WordInputSection(inputText: String, setInputText: (String) -> Unit) {
+    var localInputText by remember { mutableStateOf(inputText) }
+    TextField(
+        value = localInputText,
         onValueChange = {
+            localInputText = it
+            setInputText(it) // Обновляем родительский state
         },
         label = { Text("Слово") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(R.color.grey_graph)),
+        modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Gray,
+            focusedContainerColor = colorResource(R.color.grey_graph),
+            unfocusedContainerColor = colorResource(R.color.grey_graph),
+            cursorColor = Color.Black,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
         trailingIcon = {
-            Row{
+            Row {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.volium), tint = Color.Black, contentDescription = "Play Sound")
+                    Icon(
+                        painterResource(R.drawable.volium),
+                        tint = Color.Black,
+                        contentDescription = "Play Sound"
+                    )
                 }
-                IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
+                IconButton(onClick = { localInputText = ""; setInputText("") }) {
+                    Icon(
+                        painterResource(R.drawable.close_icon),
+                        tint = Color.Black,
+                        contentDescription = "Clear"
+                    )
                 }
             }
         },
@@ -171,14 +178,27 @@ private fun WordInputSection() {
 @Composable
 private fun TranslationSection() {
     Column {
-        OutlinedTextField(
+        TextField(
             value = "",
             onValueChange = {},
             label = { Text("Добавить свой перевод") },
             modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Gray,
+                focusedContainerColor = colorResource(R.color.grey_graph),
+                unfocusedContainerColor = colorResource(R.color.grey_graph),
+                cursorColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
             trailingIcon = {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
+                    Icon(
+                        painterResource(R.drawable.close_icon),
+                        tint = Color.Black,
+                        contentDescription = "Clear"
+                    )
                 }
             }
         )
@@ -201,14 +221,27 @@ private fun TranslationSection() {
 @Composable
 private fun ExampleUsageSection() {
     Column {
-        OutlinedTextField(
+        TextField(
             value = "",
             onValueChange = {},
             label = { Text("Добавить свой пример") },
             modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Gray,
+                focusedContainerColor = colorResource(R.color.grey_graph),
+                unfocusedContainerColor = colorResource(R.color.grey_graph),
+                cursorColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
             trailingIcon = {
                 IconButton(onClick = {}) {
-                    Icon(painterResource(R.drawable.close_icon), tint = Color.Black, contentDescription = "Clear")
+                    Icon(
+                        painterResource(R.drawable.close_icon),
+                        tint = Color.Black,
+                        contentDescription = "Clear"
+                    )
                 }
             }
         )
@@ -222,11 +255,9 @@ private fun ExampleUsageSection() {
     }
 }
 
-@Composable
+/*@Composable
 @Preview(showSystemUi = true)
 private fun PreviewAddWord() {
     val navController = rememberNavController()
-    AddWordScreen(navController)
-}
-
-
+    AddWordScreen(navController, null)
+}*/
