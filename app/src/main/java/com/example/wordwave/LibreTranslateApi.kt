@@ -1,12 +1,16 @@
 package com.example.wordwave
 
-import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.Headers
-import retrofit2.http.POST
+sealed class LibreTranslateApi<out T> {
+    data class Success<out T>(val data: T) : LibreTranslateApi<T>()
+    data class Failure(val exception: Exception) : LibreTranslateApi<Nothing>()
+}
 
-interface LibreTranslateApi {
-    @Headers("Content-Type: application/json")
-    @POST("translate")
-    fun translate(@Body request: TranslateRequest): Call<TranslateResponse>
+fun <T> LibreTranslateApi<T>.onSuccess(action: (T) -> Unit): LibreTranslateApi<T> {
+    if (this is LibreTranslateApi.Success) action(data)
+    return this
+}
+
+fun <T> LibreTranslateApi<T>.onFailure(action: (Exception) -> Unit): LibreTranslateApi<T> {
+    if (this is LibreTranslateApi.Failure) action(exception)
+    return this
 }
