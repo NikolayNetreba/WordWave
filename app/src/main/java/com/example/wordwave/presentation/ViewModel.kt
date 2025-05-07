@@ -6,15 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wordwave.data.local.dp.entities.Language
-import com.example.wordwave.data.local.dp.entities.User
-import com.example.wordwave.data.local.dp.entities.Word
+import com.example.wordwave.data.local.db.entities.Language
+import com.example.wordwave.data.local.db.entities.User
+import com.example.wordwave.data.local.db.entities.Word
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import com.example.wordwave.data.translate.LibreTranslateApi
 import com.example.wordwave.data.translate.YandexGptService
-import com.example.wordwave.data.local.dp.AppDatabase
-import com.example.wordwave.data.local.dp.DictionaryRepository
+import com.example.wordwave.data.local.db.AppDatabase
+import com.example.wordwave.data.local.db.DictionaryRepository
 import kotlinx.coroutines.flow.*
 
 class ViewModel(application: Application) : AndroidViewModel(application) {

@@ -1,17 +1,17 @@
-package com.example.wordwave.data.local.dp
+package com.example.wordwave.data.local.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.wordwave.data.local.dp.dao.LanguageDao
-import com.example.wordwave.data.local.dp.dao.UserDao
-import com.example.wordwave.data.local.dp.dao.WordDao
-import com.example.wordwave.data.local.dp.entities.Language
-import com.example.wordwave.data.local.dp.entities.User
-import com.example.wordwave.data.local.dp.entities.Word
+import com.example.wordwave.data.local.db.dao.LanguageDao
+import com.example.wordwave.data.local.db.dao.UserDao
+import com.example.wordwave.data.local.db.dao.WordDao
+import com.example.wordwave.data.local.db.entities.Language
+import com.example.wordwave.data.local.db.entities.User
+import com.example.wordwave.data.local.db.entities.Word
 
-@Database(entities = [User::class, Language::class, Word::class], version = 1)
+@Database(entities = [User::class, Language::class, Word::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun languageDao(): LanguageDao

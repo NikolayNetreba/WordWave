@@ -1,4 +1,4 @@
-package com.example.wordwave.data.local.dp.entities
+package com.example.wordwave.data.local.db.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey

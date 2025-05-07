@@ -1,9 +1,9 @@
-package com.example.wordwave.data.local.dp.dao
+package com.example.wordwave.data.local.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.wordwave.data.local.dp.entities.Language
+import com.example.wordwave.data.local.db.entities.Language
 
 @Dao
 interface LanguageDao {
