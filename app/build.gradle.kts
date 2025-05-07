@@ -1,13 +1,24 @@
+import java.util.Properties
+
 plugins {
-    alias(libs.plugins.android.application) version "8.10.0-alpha07"
-    alias(libs.plugins.kotlin.android) version "2.1.10"
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp") version "2.1.10-1.0.31"
-    alias(libs.plugins.kotlin.compose) version "2.1.10"
+    alias(libs.plugins.kotlin.compose)
 }
+
+val localProperties = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
+
 
 android {
     namespace = "com.example.wordwave"
     compileSdk = 35
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.example.wordwave"
@@ -17,8 +28,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
+        vectorDrawables.useSupportLibrary = true
+
+        buildConfigField("String", "API_KEY", "\"${localProperties.getProperty("API_KEY")}\"")
+        buildConfigField("String", "FOLDER_ID", "\"${localProperties.getProperty("FOLDER_ID")}\"")
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += mapOf(
+                    "room.schemaLocation" to "$projectDir/schemas",
+                    "room.incremental" to "true"
+                )
+            }
         }
     }
 
@@ -75,18 +96,11 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
-
-    val roomVersion = "2.6.1"
-
     implementation (libs.androidx.room.runtime)
 
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See KSP Quickstart to add KSP to your build
     ksp (libs.androidx.room.compiler)
-
-    // If this project only uses Java source, use the Java annotationProcessor
-    // No additional plugins are necessary
-    annotationProcessor (libs.androidx.room.compiler)
 
     // optional - RxJava2 support for Room
     implementation (libs.androidx.room.rxjava2)

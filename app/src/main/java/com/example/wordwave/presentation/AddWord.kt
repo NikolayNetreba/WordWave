@@ -14,16 +14,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
-import com.example.wordwave.presentation.db.DictionaryViewModel
+import com.example.wordwave.presentation.ViewModel
 
 @Composable
-fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewModel) {
+fun AddWordScreen(navController: NavHostController, viewModel: ViewModel) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -64,7 +62,7 @@ fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewMod
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
+private fun TopBar(navController: NavHostController, viewModel: ViewModel) {
     val scope = rememberCoroutineScope()
 
     TopAppBar(
@@ -97,7 +95,7 @@ private fun TopBar(navController: NavHostController, viewModel: DictionaryViewMo
             IconButton(
                 onClick =
                     {
-                        viewModel.addSampleData()
+                        //viewModel.addSampleData()
                     })
             {
 

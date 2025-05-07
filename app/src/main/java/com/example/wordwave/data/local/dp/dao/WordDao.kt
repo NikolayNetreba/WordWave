@@ -1,10 +1,10 @@
-package com.example.wordwave.presentation.db.dao
+package com.example.wordwave.data.local.dp.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.wordwave.presentation.db.entities.Word
+import com.example.wordwave.data.local.dp.entities.Word
 
 @Dao
 interface WordDao {

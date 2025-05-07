@@ -1,4 +1,4 @@
-package com.example.wordwave
+package com.example.wordwave.data.translate
 
 sealed class LibreTranslateApi<out T> {
     data class Success<out T>(val data: T) : LibreTranslateApi<T>()

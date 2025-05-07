@@ -1,15 +1,15 @@
-package com.example.wordwave.presentation.db
+package com.example.wordwave.data.local.dp
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.wordwave.presentation.db.dao.LanguageDao
-import com.example.wordwave.presentation.db.dao.UserDao
-import com.example.wordwave.presentation.db.dao.WordDao
-import com.example.wordwave.presentation.db.entities.Language
-import com.example.wordwave.presentation.db.entities.User
-import com.example.wordwave.presentation.db.entities.Word
+import com.example.wordwave.data.local.dp.dao.LanguageDao
+import com.example.wordwave.data.local.dp.dao.UserDao
+import com.example.wordwave.data.local.dp.dao.WordDao
+import com.example.wordwave.data.local.dp.entities.Language
+import com.example.wordwave.data.local.dp.entities.User
+import com.example.wordwave.data.local.dp.entities.Word
 
 @Database(entities = [User::class, Language::class, Word::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {

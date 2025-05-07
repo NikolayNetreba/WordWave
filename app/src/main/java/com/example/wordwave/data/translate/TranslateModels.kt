@@ -1,4 +1,4 @@
-package com.example.wordwave
+package com.example.wordwave.data.translate
 
 data class GptRequest(
     val modelUri: String,

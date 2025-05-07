@@ -1,13 +1,12 @@
 package com.example.wordwave.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.content.contentReceiver
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -27,11 +26,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
-import com.example.wordwave.TranslationViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.text.input.ImeAction
+
 
 @Composable
 fun TranslateScreen(
@@ -171,31 +171,25 @@ private fun LanguageSelector() {
 
 @Composable
 fun TranslateInputField(
-    viewModel: TranslationViewModel, // Callback при изменении текста
-    navController: NavHostController      // Контроллер навигации
+    viewModel: TranslationViewModel,
+    navController: NavHostController
 ) {
     val inputText by viewModel.inputText.collectAsState()
     val translatedText by viewModel.translatedText.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
-    // Локальное состояние для текста
-    var localInputText by remember { mutableStateOf(inputText) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // Рассчитываем размер шрифта
     val fontSize = with(LocalDensity.current) {
         when {
-            localInputText.length < 30 -> 18.sp
-            localInputText.length < 60 -> 16.sp
+            inputText.length < 30 -> 18.sp
+            inputText.length < 60 -> 16.sp
             else -> 14.sp
         }
     }
 
-    // Состояние прокрутки
     val scrollState = rememberScrollState()
-
-    LaunchedEffect(inputText) {
-        if (inputText.isNotBlank()) viewModel.translateText()
-    }
 
     Box(
         modifier = Modifier
@@ -204,7 +198,6 @@ fun TranslateInputField(
             .clip(RoundedCornerShape(12.dp))
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Секция ввода текста
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -212,7 +205,6 @@ fun TranslateInputField(
                     .heightIn(min = 50.dp, max = 150.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Поле ввода
                 Box(modifier = Modifier.weight(1f)) {
                     TextField(
                         value = inputText,
@@ -229,14 +221,23 @@ fun TranslateInputField(
                             unfocusedIndicatorColor = Color.Transparent
                         ),
                         textStyle = LocalTextStyle.current.copy(fontSize = fontSize),
-                        singleLine = false
+                        singleLine = false,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Search
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onSearch = {
+                                viewModel.translateText()
+                                keyboardController?.hide()
+                            }
+                        )
                     )
                 }
 
                 // Кнопка очистки
-                if (localInputText.isNotEmpty()) {
+                if (inputText.isNotEmpty()) {
                     IconButton(
-                        onClick = { localInputText = "" },
+                        onClick = viewModel::clearInputText,
                         modifier = Modifier.align(Alignment.Top)
                     ) {
                         Icon(
@@ -250,7 +251,7 @@ fun TranslateInputField(
             }
 
             // Секция перевода (только если есть текст)
-            if (localInputText.isNotEmpty()) {
+            if (inputText.isNotEmpty()) {
                 // Кнопки действий
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -292,19 +293,15 @@ fun TranslateInputField(
                             .verticalScroll(scrollState)
                     ) {
                         if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .align(Alignment.CenterHorizontally)
-                            )
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                         } else {
                             Text(
                                 text = translatedText,
                                 fontSize = fontSize,
                                 color = Color.Black,
                                 modifier = Modifier
-                                    .padding(horizontal = 8.dp)
                                     .fillMaxWidth()
+                                    .padding(horizontal = 8.dp)
                             )
                         }
                     }

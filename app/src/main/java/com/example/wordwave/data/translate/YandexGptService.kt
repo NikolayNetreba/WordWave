@@ -1,5 +1,6 @@
-package com.example.wordwave
+package com.example.wordwave.data.translate
 
+import com.example.wordwave.BuildConfig
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -20,33 +21,22 @@ class YandexGptService {
     }
 
     suspend fun translateText(
-        apiKey: String,
-        folderId: String,
         text: String
     ): LibreTranslateApi<String> {
+        val apiKey = BuildConfig.API_KEY
+        val folderId = BuildConfig.FOLDER_ID
+
         return try {
             val prompt = """
                 Ты профессиональный переводчик. Переведи слово или фразу "$text" с английского на русский язык.
-                Дай основной перевод, затем дополнительные варианты.
-                Если слово может быть разными частями речи, предоставь перевод для каждой.
-                Также сгенерируй 5 небольших предложений с этим словом на английском и их перевод на русский.
-                
-                Формат вывода:
-                Основной перевод: [перевод]
-                
-                Дополнительные переводы:
-                - [часть речи]: [перевод]
-                
-                Примеры:
-                1. [английское предложение] - [русский перевод]
-                2. ...
+                Дай только основной перевод.
             """.trimIndent()
 
             val request = GptRequest(
                 modelUri = "gpt://$folderId/yandexgpt-lite",
                 completionOptions = CompletionOptions(),
                 messages = listOf(
-                    Message(role = "system", text = "You are a yandex translator, and you "),
+                    Message(role = "system", text = "You are a yandex translator"),
                     Message(role = "user", text = prompt)
                 )
             )
