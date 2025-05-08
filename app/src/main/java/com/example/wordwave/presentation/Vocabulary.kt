@@ -19,29 +19,26 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
+import com.example.wordwave.presentation.db.DictionaryViewModel
+import com.example.wordwave.presentation.db.entities.Word
 
 
 @Composable
-fun VocabularyScreen(navController: NavHostController) {
-    val words: List<Pair<String, String>> = listOf(
+fun VocabularyScreen(navController: NavHostController, viewModel: DictionaryViewModel) {
+    /*val words: List<Pair<String, String>> = listOf(
         "hi" to "Привет",
         "bye" to "Пока",
         "apple" to "Яблоко",
         "table" to "Стол",
         "cat" to "Кот"
-    )
-
-
+    )*/
 
     val categories = listOf("Все", "Изучаемые", "Выученные", "Фразы", "Слова")
-
+    viewModel.updateWords(1)
     Scaffold(
         topBar = {
             Column {
@@ -60,7 +57,8 @@ fun VocabularyScreen(navController: NavHostController) {
                     .padding(padding)
                     .background(Color.White)
             ) {
-                ShowWordList(words)
+
+                ShowWordList(viewModel.words)
             }
         }
     )
@@ -144,9 +142,22 @@ private fun VocabularyTopBar() {
 }
 
 @Composable
-fun ShowWordList(words: List<Pair<String, String>>) {
+fun ShowWordList(words: List<Word>) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        itemsIndexed(words) { index, (word, translation) ->
+        /*itemsIndexed(words) { index, (word, translation) ->
+            NoteItem(
+                word = word,
+                translation = translation,
+                isFirst = index == 0
+            )
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = colorResource(R.color.line)
+            )
+
+        }*/
+
+        itemsIndexed(words) { index, (_, _, word, translation) ->
             NoteItem(
                 word = word,
                 translation = translation,
@@ -187,12 +198,12 @@ fun NoteItem(word: String, translation: String, isFirst: Boolean) {
     }
 }
 
-@Preview(showSystemUi = true)
+/*@Preview(showSystemUi = true)
 @Composable
 fun VocabularyPreview() {
     val navController = rememberNavController()
     VocabularyScreen(navController)
-}
+}*/
 
 
 

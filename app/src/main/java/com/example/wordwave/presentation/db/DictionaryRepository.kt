@@ -13,7 +13,7 @@ class DictionaryRepository(
     private val wordDao: WordDao
 ) {
     suspend fun upsertUser(user: User) = userDao.upsertUser(user)
-    suspend fun upsertLanguage(language: Language) = languageDao.insertLanguage(language)
+    suspend fun upsertLanguage(language: Language) = languageDao.upsertLanguage(language)
     suspend fun upsertWord(word: Word) = wordDao.upsertWord(word)
 
     suspend fun getLanguages(userId: String): List<Language> = languageDao.getLanguagesByUser(userId)

@@ -14,20 +14,20 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 import com.example.wordwave.presentation.db.DictionaryViewModel
 
 @Composable
 fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewModel) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
+    val (translation, setTranslation) = remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
-            TopBar(navController, viewModel)
+            TopBar(navController, viewModel, inputText, translation)
         },
         bottomBar = {
             NavigationBar(navController)
@@ -52,7 +52,7 @@ fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewMod
                         Spacer(modifier = Modifier.height(16.dp))
                         WordInputSection(inputText = inputText, setInputText = setInputText)
                         Spacer(modifier = Modifier.height(16.dp))
-                        TranslationSection()
+                        TranslationSection(translation = translation, setTranslation = setTranslation)
                         Spacer(modifier = Modifier.height(16.dp))
                         ExampleUsageSection()
                     }
@@ -64,9 +64,12 @@ fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewMod
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
-    val scope = rememberCoroutineScope()
-
+private fun TopBar(
+    navController: NavHostController,
+    viewModel: DictionaryViewModel,
+    inputText: String,
+    translation: String
+) {
     TopAppBar(
         title = {
             Box(
@@ -97,7 +100,10 @@ private fun TopBar(navController: NavHostController, viewModel: DictionaryViewMo
             IconButton(
                 onClick =
                     {
-                        viewModel.addSampleData()
+                        /*print(inputText)
+                        print(setInputText)*/
+                        //viewModel.addWord("Hello", "Привет!")
+                        viewModel.addWord(inputText, translation)
                     })
             {
                 Icon(
@@ -176,11 +182,15 @@ private fun WordInputSection(inputText: String, setInputText: (String) -> Unit) 
 }
 
 @Composable
-private fun TranslationSection() {
+private fun TranslationSection(translation: String, setTranslation: (String) -> Unit) {
+    var localTranslation by remember { mutableStateOf(translation) }
     Column {
         TextField(
-            value = "",
-            onValueChange = {},
+            value = localTranslation,
+            onValueChange = {
+                localTranslation = it
+                setTranslation(it)
+            },
             label = { Text("Добавить свой перевод") },
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
@@ -193,7 +203,7 @@ private fun TranslationSection() {
                 unfocusedIndicatorColor = Color.Transparent
             ),
             trailingIcon = {
-                IconButton(onClick = {}) {
+                IconButton(onClick = { localTranslation = ""; setTranslation("") }) {
                     Icon(
                         painterResource(R.drawable.close_icon),
                         tint = Color.Black,

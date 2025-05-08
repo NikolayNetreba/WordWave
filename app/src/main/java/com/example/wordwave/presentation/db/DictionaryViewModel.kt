@@ -18,9 +18,43 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
     var words by mutableStateOf<List<Word>>(emptyList())
         private set
 
-    fun loadWords(languageId: Int) {
+    var languages by mutableStateOf<List<Language>>(emptyList())
+        private set
+
+    fun updateWords(languageId: Int) {
         viewModelScope.launch {
             words = repo.getWords(languageId)
+        }
+    }
+
+    private fun updateLanguages(userId: String) {
+        viewModelScope.launch {
+            languages = repo.getLanguages(userId)
+        }
+    }
+
+    fun updateAll(userId: String) {
+        updateLanguages(userId)
+
+        for (language in languages) {
+            updateWords(language.id)
+        }
+    }
+
+    fun addWord(word: String, translation: String) {
+        viewModelScope.launch {
+            repo.upsertWord(
+                Word(
+                    languageId = 1,
+                    word = word,
+                    translation = translation,
+                    example = "null",
+                    imageUrl = null,
+                    progress = 0
+                )
+            )
+
+            updateWords(1)
         }
     }
 
@@ -43,16 +77,16 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
             )
 
             repo.upsertWord(word)
-            loadWords(langs[0].id)
+            //updateLanguages("u0")
+            updateWords(langs[0].id)
         }
     }
 
     fun updateProgress(wordId: Int, newProgress: Int) {
         viewModelScope.launch {
             repo.updateProgress(wordId, newProgress)
-            // Reload to reflect changes
             val currentLangId = words.firstOrNull()?.languageId ?: return@launch
-            loadWords(currentLangId)
+            updateWords(currentLangId)
         }
     }
 }

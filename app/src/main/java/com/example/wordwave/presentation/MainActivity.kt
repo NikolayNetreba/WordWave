@@ -43,8 +43,8 @@ fun AllApp(viewModel: DictionaryViewModel) {
 
     NavHost(navController = navController, startDestination = "home_screen") {
         composable("home_screen") { HomePageScreen(navController) }
-        composable("vocabulary_screen") { VocabularyScreen(navController) }
-        composable("add_word_screen") { AddWordScreen(navController, viewModel) }
+        composable("vocabulary_screen") { VocabularyScreen(navController, viewModel) }
+        composable("add_word_screen") { AddWordScreen(navController, viewModel  ) }
         composable("translate_screen") { TranslateScreen(navController) }
     }
 }

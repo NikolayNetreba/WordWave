@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application) version "8.8.0-alpha05"
+    alias(libs.plugins.android.application) version "8.8.2"
     alias(libs.plugins.kotlin.android) version "2.1.10"
     id("com.google.devtools.ksp") version "2.1.10-1.0.31"
     alias(libs.plugins.kotlin.compose) version "2.1.10"
