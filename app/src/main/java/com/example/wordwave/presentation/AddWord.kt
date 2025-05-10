@@ -100,10 +100,9 @@ private fun TopBar(
             IconButton(
                 onClick =
                     {
-                        /*print(inputText)
-                        print(setInputText)*/
-                        //viewModel.addWord("Hello", "Привет!")
-                        viewModel.addWord(inputText, translation)
+                        viewModel.addSampleData()
+                        viewModel.addWordWithTranslation(inputText, translation)
+                        viewModel.addWordWithTranslations("Draw", listOf("Ничья", "Рисовать"))
                     })
             {
                 Icon(

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.wordwave.R
 import com.example.wordwave.presentation.db.DictionaryViewModel
+import com.example.wordwave.presentation.db.WordWithTranslations
 import com.example.wordwave.presentation.db.entities.Word
 
 
@@ -57,8 +58,9 @@ fun VocabularyScreen(navController: NavHostController, viewModel: DictionaryView
                     .padding(padding)
                     .background(Color.White)
             ) {
-
-                ShowWordList(viewModel.words)
+                viewModel.updateLanguages("u0")
+                viewModel.updateWordsWithTranslations(1)
+                ShowWordList(viewModel.wordsWithTranslations)
             }
         }
     )
@@ -142,9 +144,22 @@ private fun VocabularyTopBar() {
 }
 
 @Composable
-fun ShowWordList(words: List<Word>) {
+fun ShowWordList(words: List<WordWithTranslations>) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        /*itemsIndexed(words) { index, (word, translation) ->
+        itemsIndexed(words) { index, (word, translations) ->
+            NoteItem(
+                word = word.word,
+                translation = if (translations.size > 1) translations[1].value else translations[0].value,
+                isFirst = index == 0
+            )
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = colorResource(R.color.line)
+            )
+
+        }
+
+        /*itemsIndexed(words) { index, (word, translations[0]) ->
             NoteItem(
                 word = word,
                 translation = translation,
@@ -156,19 +171,6 @@ fun ShowWordList(words: List<Word>) {
             )
 
         }*/
-
-        itemsIndexed(words) { index, (_, _, word, translation) ->
-            NoteItem(
-                word = word,
-                translation = translation,
-                isFirst = index == 0
-            )
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = colorResource(R.color.line)
-            )
-
-        }
     }
 }
 
