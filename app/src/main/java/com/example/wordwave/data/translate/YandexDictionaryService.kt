@@ -19,8 +19,10 @@ class YandexDictionaryService {
 
     suspend fun lookup(
         word: String,
-        lang: String = "en-ru"
+        from: String,
+        to: String
     ): LibreTranslateApi<DictionaryResponse> {
+        val lang: String = "$from-$to"
         val apiKey = BuildConfig.YANDEX_DICTIONARY_API_KEY
         return try {
             val response: DictionaryResponse =

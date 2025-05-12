@@ -47,7 +47,7 @@ fun TranslateScreen(
     Scaffold(
         topBar = {
             Column {
-                TopBar(navController)
+                TopBar(navController, "Переводчик")
                 HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.line))
             }
         },
@@ -68,7 +68,7 @@ fun TranslateScreen(
                         .background(Color.White)
                 ) {
                     Column {
-                        LanguageSelector()
+                        LanguageSelector(viewModel)
                         HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.line))
                         TranslateInputField(viewModel, navController)
                     }
@@ -143,9 +143,25 @@ fun TranslateScreen(
 }
 
 @Composable
-private fun LanguageSelector() {
-    val (sourceLanguage, setSourceLanguage) = remember { mutableStateOf("Английский") }
-    val (targetLanguage, setTargetLanguage) = remember { mutableStateOf("Русский") }
+fun LanguageSelector(viewModel: TranslationViewModel) {
+    val fromLangCode = viewModel.fromLang.value
+    val toLangCode = viewModel.toLang.value
+
+    val languageMap = mapOf(
+        "en" to "Английский",
+        "ru" to "Русский",
+        "tr" to "Турецкий",
+        "de" to "Немецкий",
+        "fr" to "Французский",
+        "it" to "Итальянский",
+        "es" to "Испанский"
+    )
+
+    var showSourceDropdown by remember { mutableStateOf(false) }
+    var showTargetDropdown by remember { mutableStateOf(false) }
+
+    val sourceName = languageMap[fromLangCode] ?: fromLangCode
+    val targetName = languageMap[toLangCode] ?: toLangCode
 
     Row(
         modifier = Modifier
@@ -154,59 +170,93 @@ private fun LanguageSelector() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.Black
-            ),
-            modifier = Modifier.weight(1f)
+
+        Box(modifier = Modifier
+            .weight(1f)
+            .wrapContentSize(Alignment.TopStart)
         ) {
-            Text(
-                text = sourceLanguage,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black,
-                maxLines = 1,
-                overflow = TextOverflow.Clip,
-            )
+            Button(
+                onClick = { showSourceDropdown = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    sourceName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip,
+                )
+            }
+
+            DropdownMenu(
+                expanded = showSourceDropdown,
+                onDismissRequest = { showSourceDropdown = false }
+            ) {
+                languageMap.forEach { (code, name) ->
+                    DropdownMenuItem(
+                        text = { Text(name) },
+                        onClick = {
+                            viewModel.setLanguagesSmart(code, isSource = true)
+                            showSourceDropdown = false
+                        }
+                    )
+                }
+            }
         }
 
         IconButton(
             onClick = {
-                val temp = sourceLanguage
-                setSourceLanguage(targetLanguage)
-                setTargetLanguage(temp)
+                viewModel.swapLanguages()
             },
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
             Icon(
-                painterResource(R.drawable.swap_languages),
-                contentDescription = "swap languages",
+                painter = painterResource(R.drawable.swap_languages),
+                contentDescription = "Swap Languages",
                 tint = Color.Black
             )
         }
-
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.Black
-            ),
-            contentPadding = PaddingValues(0.dp),
-            modifier = Modifier.weight(1f)
+        
+        Box(modifier = Modifier
+            .weight(1f)
+            .wrapContentSize(Alignment.TopStart)
         ) {
-            Text(
-                text = targetLanguage,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black,
-                maxLines = 1,
-                overflow = TextOverflow.Clip,
-            )
+            Button(
+                onClick = { showTargetDropdown = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    targetName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip,
+                )
+            }
+
+            DropdownMenu(
+                expanded = showTargetDropdown,
+                onDismissRequest = { showTargetDropdown = false }
+            ) {
+                languageMap.forEach { (code, name) ->
+                    DropdownMenuItem(
+                        text = { Text(name) },
+                        onClick = {
+                            viewModel.setLanguagesSmart(code, isSource = false)
+                            showTargetDropdown = false
+                        }
+                    )
+                }
+            }
         }
     }
 }
+
+
 
 @OptIn(FlowPreview::class)
 @Composable
@@ -218,7 +268,7 @@ fun TranslateInputField(
     val errorMessage by viewModel.errorMessage.collectAsState()
     val primaryTranslation by viewModel.primaryTranslation.collectAsState()
 
-    val keyboardController = LocalSoftwareKeyboardController.current
+    //val keyboardController = LocalSoftwareKeyboardController.current
     val fontSize = with(LocalDensity.current) {
         when {
             inputText.length < 30 -> 24.sp
@@ -229,7 +279,7 @@ fun TranslateInputField(
 
     LaunchedEffect(inputText) {
         snapshotFlow { inputText }
-            .debounce(500)
+            .debounce(250)
             .filter { it.isNotBlank() }
             .distinctUntilChanged()
             .collectLatest {
@@ -249,7 +299,7 @@ fun TranslateInputField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 50.dp, max = 150.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextField(
                     value = inputText,
@@ -314,13 +364,24 @@ fun TranslateInputField(
                         modifier = Modifier.fillMaxWidth(),
                         thickness = 1.dp,
                         color = colorResource(id = R.color.line)
+
                     )
                     errorMessage?.let {
-                        Text(text = it, color = Color.Red, modifier = Modifier.padding(8.dp))
+                        Text(
+                            text = it,
+                            color = Color.Red,
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
                     }
                     // Основной перевод
 
-                    Text(primaryTranslation, fontSize = fontSize, modifier = Modifier.padding(8.dp))
+                    Text(
+                        primaryTranslation,
+                        fontSize = fontSize,
+                        modifier = Modifier
+                            .padding(8.dp)
+                    )
 
                     // Кнопка прослушивания перевода
                     IconButton(onClick = { /* Прослушивание перевода */ }) {

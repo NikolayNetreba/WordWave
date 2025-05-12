@@ -1,10 +1,6 @@
 package com.example.wordwave.presentation
 
 import android.app.Application
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wordwave.data.local.db.entities.Language
@@ -12,6 +8,7 @@ import com.example.wordwave.data.local.db.entities.User
 import com.example.wordwave.data.local.db.entities.Word
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.*
 import com.example.wordwave.data.translate.LibreTranslateApi
 import com.example.wordwave.data.translate.YandexGptService
 import com.example.wordwave.data.local.db.AppDatabase
@@ -62,7 +59,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     fun updateProgress(wordId: Int, newProgress: Int) {
         viewModelScope.launch {
             repo.updateProgress(wordId, newProgress)
-            // Reload to reflect changes
             val currentLangId = words.firstOrNull()?.languageId ?: return@launch
             loadWords(currentLangId)
         }
@@ -72,7 +68,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 class TranslationViewModel : ViewModel() {
     val definitions = MutableStateFlow<List<Definition>>(emptyList())
 
-    // Состояния UI
     val primaryTranslation = MutableStateFlow("")
     val additionalTranslations = MutableStateFlow<List<String>>(emptyList())
     val synonyms = MutableStateFlow<List<String>>(emptyList())
@@ -87,10 +82,15 @@ class TranslationViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
-    // Сервисы
     private val translateService = YandexTranslateService()
     private val dictionaryService = YandexDictionaryService()
     private val gptService = YandexGptService()
+
+    private val _fromLang = mutableStateOf("en")
+    val fromLang: State<String> = _fromLang
+
+    private val _toLang = mutableStateOf("ru")
+    val toLang: State<String> = _toLang
 
     fun updateInputText(text: String) {
         _inputText.value = text
@@ -106,47 +106,41 @@ class TranslationViewModel : ViewModel() {
         definitions.value = emptyList()
     }
 
-    fun translateWord(fromLang: String = "en", toLang: String = "ru") {
+    fun translateWord() {
         val word = _inputText.value.trim()
         if (word.isEmpty()) return
+
+        val from = fromLang.value
+        val to = toLang.value
 
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
 
             try {
-                // 1. Перевод
-                when (val response = translateService.translate(word, fromLang, toLang)) {
+                when (val response = translateService.translate(word, from, to)) {
                     is LibreTranslateApi.Success<*> -> primaryTranslation.value = response.data.toString()
                     is LibreTranslateApi.Failure -> _errorMessage.value = "Ошибка перевода: ${response.exception.localizedMessage}"
                 }
 
-                // 2. Словарь
-                dictionaryService.lookup(word).onSuccess { response ->
+                dictionaryService.lookup(word, from, to).onSuccess { response ->
                     val defs = response.def
-
                     definitions.value = defs
-
                     val allTranslations = mutableSetOf<String>()
                     val allSynonyms = mutableSetOf<String>()
-
                     for (def in defs) {
                         for (tr in def.tr) {
                             allTranslations.add(tr.text)
-                            tr.syn?.let { syns ->
-                                syns.forEach { allSynonyms.add(it.text) }
-                            }
+                            tr.syn?.forEach { allSynonyms.add(it.text) }
                         }
                     }
-
                     additionalTranslations.value = allTranslations.toList()
                     synonyms.value = allSynonyms.toList()
                 }.onFailure {
                     _errorMessage.value = "Ошибка словаря: ${it.localizedMessage}"
                 }
 
-                // 3. Примеры
-                when (val gptResponse = gptService.generateExamples(word)) {
+                when (val gptResponse = gptService.generateExamples(word, from, to)) {
                     is LibreTranslateApi.Success -> examples.value = gptResponse.data
                     is LibreTranslateApi.Failure -> _errorMessage.value = "Ошибка GPT: ${gptResponse.exception.localizedMessage}"
                 }
@@ -158,6 +152,41 @@ class TranslationViewModel : ViewModel() {
             _isLoading.value = false
         }
     }
+
+    fun setLanguagesSmart(selectedLang: String, isSource: Boolean) {
+        val from = _fromLang.value
+        val to = _toLang.value
+        val input = _inputText.value
+        val output = primaryTranslation.value
+
+        if ((isSource && selectedLang == to) || (!isSource && selectedLang == from)) {
+            _fromLang.value = to
+            _toLang.value = from
+            _inputText.value = output
+            primaryTranslation.value = input
+            translateWord()
+            return
+        }
+
+        if (isSource) {
+            _fromLang.value = selectedLang
+            translateWord()
+        } else {
+            _toLang.value = selectedLang
+            translateWord()
+        }
+    }
+
+    fun swapLanguages() {
+        val from = _fromLang.value
+        val to = _toLang.value
+        val input = _inputText.value
+        val output = primaryTranslation.value
+
+        _fromLang.value = to
+        _toLang.value = from
+        _inputText.value = output
+        primaryTranslation.value = input
+        translateWord()
+    }
 }
-
-

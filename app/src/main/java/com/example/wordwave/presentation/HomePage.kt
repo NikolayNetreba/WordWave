@@ -27,7 +27,7 @@ import com.example.wordwave.R
 @Composable
 fun HomePageScreen(navController: NavHostController) {
     Scaffold(
-        topBar = { TopBar(navController) },
+        topBar = { TopBar(navController, "Английский") },
         bottomBar = { NavigationBar(navController)},
         modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()),
         content = { padding ->
@@ -38,10 +38,10 @@ fun HomePageScreen(navController: NavHostController) {
                     .background(Color.White)
             ) {
                 AllWordButton(navController)
-                HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
+                HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
                 Diagrams()
-                HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
-                GamesTable()
+                HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
+                //GamesTable()
             }
         },
         containerColor = Color.White
@@ -50,11 +50,11 @@ fun HomePageScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun TopBar(navController: NavHostController) {
+internal fun TopBar(navController: NavHostController, title: String) {
     CenterAlignedTopAppBar(
         title = {
             Text(
-                text = stringResource(R.string.bar_title),
+                text = title,
                 fontSize = dimensionResource(R.dimen.title_size).value.sp,
                 fontWeight = FontWeight.SemiBold,
 

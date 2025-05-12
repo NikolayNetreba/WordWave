@@ -21,16 +21,16 @@ class YandexGptService {
         }
     }
 
-    suspend fun generateExamples(word: String): LibreTranslateApi<List<String>> {
+    suspend fun generateExamples(word: String, from: String, to: String): LibreTranslateApi<List<String>> {
         val apiKey = BuildConfig.API_KEY
         val folderId = BuildConfig.FOLDER_ID
 
         return try {
             val prompt = """
                 Ты профессиональный писатель-переводчик.
-                Придумай 5 коротких примеров использования слова "$word" в английских предложениях с переводом на русский.
+                Придумай 5 коротких примеров использования слова "$word" в $from предложениях с переводом на $to.
                 Формат ответа строго:
-                1. Example in English — Перевод.
+                1. Пример на $from — Перевод на $to.
                 2. ...
             """.trimIndent()
 
