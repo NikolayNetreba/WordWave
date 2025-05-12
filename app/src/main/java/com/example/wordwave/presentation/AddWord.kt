@@ -30,6 +30,7 @@ fun AddWordScreen(navController: NavHostController, viewModel: ViewModel) {
         bottomBar = {
             NavigationBar(navController)
         },
+        modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()),
         containerColor = Color.White,
         content = { padding ->
             Box(

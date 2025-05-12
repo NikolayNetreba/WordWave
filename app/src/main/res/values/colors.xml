@@ -11,4 +11,6 @@
     <color name="grey_graph">#F2F2F7</color>
     <color name="bar">#5373E8</color>
     <color name="text_bar">#D9F1FF</color>
+    <color name="greY">#f7f8fc</color>
+    <color name="Grey">#eaedf6</color>
 </resources>

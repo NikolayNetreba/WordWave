@@ -52,6 +52,7 @@ fun VocabularyScreen(navController: NavHostController) {
         bottomBar = {
             NavigationBar(navController)
         },
+        modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()),
         containerColor = Color.White,
         content = { padding ->
             Box(

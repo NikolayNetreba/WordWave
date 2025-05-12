@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,12 +18,14 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
+
+
     private val DviewModel: ViewModel by viewModels()
     private val TviewModel: TranslationViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             WordWaveTheme {
                 AllApp(DviewModel, TviewModel)
@@ -32,7 +35,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-
 fun AllApp(DviewModel: ViewModel, TviewModel: TranslationViewModel) {
 
     val navController = rememberNavController()

@@ -29,6 +29,7 @@ fun HomePageScreen(navController: NavHostController) {
     Scaffold(
         topBar = { TopBar(navController) },
         bottomBar = { NavigationBar(navController)},
+        modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()),
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -49,7 +50,7 @@ fun HomePageScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController) {
+internal fun TopBar(navController: NavHostController) {
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -139,7 +140,6 @@ fun GamesTable() {
 @Composable
 fun NavigationBar(navController: NavHostController) {
     Column(
-        modifier = Modifier.statusBarsPadding()
     ) {
         HorizontalDivider(color = colorResource(R.color.line), thickness = 2.dp)
         Row(

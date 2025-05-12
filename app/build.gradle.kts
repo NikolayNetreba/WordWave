@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val localProperties = Properties().apply {
@@ -30,8 +31,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
+        buildConfigField("String", "YANDEX_DICTIONARY_API_KEY", "\"${localProperties.getProperty("YANDEX_DICTIONARY_API_KEY")}\"")
         buildConfigField("String", "API_KEY", "\"${localProperties.getProperty("API_KEY")}\"")
         buildConfigField("String", "FOLDER_ID", "\"${localProperties.getProperty("FOLDER_ID")}\"")
+        buildConfigField("String", "YANDEX_TRANSLATE_API_KEY", "\"${localProperties.getProperty("YANDEX_TRANSLATE_API_KEY")}\"")
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -116,6 +119,9 @@ dependencies {
     implementation (libs.ktor.client.content.negotiation)
     implementation (libs.ktor.serialization.gson)
     implementation (libs.ktor.client.logging)
+    implementation (libs.ktor.client.okhttp)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
 
     // Coroutines
     implementation (libs.kotlinx.coroutines.core)

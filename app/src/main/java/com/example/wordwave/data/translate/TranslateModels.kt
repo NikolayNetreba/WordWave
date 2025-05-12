@@ -8,7 +8,7 @@ data class GptRequest(
 
 data class CompletionOptions(
     val stream: Boolean = false,
-    val temperature: Double = 0.6,
+    val temperature: Double = 0.5,
     val maxTokens: Int = 2000
 )
 

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,9 +30,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.room.util.TableInfo
 import com.example.wordwave.R
-import androidx.compose.ui.text.input.ImeAction
-
+import com.example.wordwave.data.translate.DictionaryResponse
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun TranslateScreen(
@@ -46,62 +52,95 @@ fun TranslateScreen(
             }
         },
         bottomBar = { NavigationBar(navController) },
-        containerColor = Color.White,
+        containerColor = colorResource(R.color.greY),
+        modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()),
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 10.dp)
-                    .navigationBarsPadding()
+                    .padding(horizontal = 10.dp)
+                    .padding(top = 12.dp)
+                    .clip(RoundedCornerShape(12.dp))
             ) {
+                // Блок с выбором языка и полем ввода
                 Box(
-                    modifier = Modifier.background(
-                        colorResource(id = R.color.grey_graph),
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                    modifier = Modifier
+                        .background(Color.White)
                 ) {
                     Column {
                         LanguageSelector()
                         HorizontalDivider(thickness = 1.dp, color = colorResource(R.color.line))
-                        TranslateInputField(
-                            viewModel = viewModel,
-                            navController = navController
-                        )
+                        TranslateInputField(viewModel, navController)
                     }
                 }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                val definitions by viewModel.definitions.collectAsState()
+                val examples by viewModel.examples.collectAsState()
+                // Блок с дополнительными переводами и примерами
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White)
+                        .padding(horizontal = 12.dp)
+                        .padding(top = 12.dp)
+                ) {
+                    definitions.forEach { def ->
+                        item {
+                            val title = buildString {
+                                append(def.text)
+                                def.pos?.let { append(" [$it]") }
+                            }
+                            SectionTitle(title)
+                        }
+
+                        items(def.tr.size) { index ->
+                            val tr = def.tr[index]
+                            Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
+                                val allSynonyms = buildList {
+                                    add(tr.text)
+                                    tr.syn?.forEach { add(it.text) }
+                                }
+
+                                Text(
+                                    "${index + 1}. " + allSynonyms.joinToString(", "),
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp
+                                )
+
+                                tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
+                                    Text(
+                                        meanings.joinToString(", ") { it.text },
+                                        color = Color.Gray,
+                                        fontSize = 12.sp,
+                                        softWrap = true
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    if (examples.isNotEmpty()) {
+                        item {
+                            SectionTitle("Примеры")
+                        }
+
+                        items(examples.size) { i ->
+                            Text(
+                                "• ${examples[i]}",
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
+                    }
+                }
+
             }
         }
     )
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(navController: NavHostController) {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.translate_title),
-                fontSize = dimensionResource(R.dimen.title_size).value.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = {}, modifier = Modifier.padding(horizontal = 2.dp)) {
-                Icon(
-                    painterResource(R.drawable.profile_icon),
-                    contentDescription = "profile_icon",
-                    tint = Color.White
-                )
-            }
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = colorResource(R.color.bar)
-        )
-    )
-}
-
 
 @Composable
 private fun LanguageSelector() {
@@ -169,77 +208,76 @@ private fun LanguageSelector() {
     }
 }
 
+@OptIn(FlowPreview::class)
 @Composable
 fun TranslateInputField(
     viewModel: TranslationViewModel,
     navController: NavHostController
 ) {
     val inputText by viewModel.inputText.collectAsState()
-    val translatedText by viewModel.translatedText.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val primaryTranslation by viewModel.primaryTranslation.collectAsState()
 
-    // Рассчитываем размер шрифта
+    val keyboardController = LocalSoftwareKeyboardController.current
     val fontSize = with(LocalDensity.current) {
         when {
-            inputText.length < 30 -> 18.sp
-            inputText.length < 60 -> 16.sp
-            else -> 14.sp
+            inputText.length < 30 -> 24.sp
+            inputText.length < 60 -> 22.sp
+            else -> 20.sp
         }
     }
 
-    val scrollState = rememberScrollState()
+    LaunchedEffect(inputText) {
+        snapshotFlow { inputText }
+            .debounce(500)
+            .filter { it.isNotBlank() }
+            .distinctUntilChanged()
+            .collectLatest {
+                viewModel.translateWord()
+            }
+    }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(id = R.color.grey_graph))
-            .clip(RoundedCornerShape(12.dp))
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+    Column {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .clip(RoundedCornerShape(12.dp))
+                .padding(8.dp)
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
                     .heightIn(min = 50.dp, max = 150.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    TextField(
-                        value = inputText,
-                        onValueChange = viewModel::updateInputText,
-                        placeholder = { Text("Введите текст") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Gray,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            cursorColor = Color.Black,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        textStyle = LocalTextStyle.current.copy(fontSize = fontSize),
-                        singleLine = false,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Search
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onSearch = {
-                                viewModel.translateText()
-                                keyboardController?.hide()
-                            }
-                        )
-                    )
-                }
+                TextField(
+                    value = inputText,
+                    onValueChange = viewModel::updateInputText,
+                    placeholder = { Text("Введите текст") },
+                    modifier = Modifier.weight(1f),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Gray,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        cursorColor = Color.Black,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    textStyle = LocalTextStyle.current.copy(fontSize = fontSize),
+//                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+//                    keyboardActions = KeyboardActions(
+//                        onSearch = {
+//                            viewModel.translateWord()
+//                            keyboardController?.hide()
+//                        }
+//                    ),
+                    singleLine = true
+                )
 
-                // Кнопка очистки
                 if (inputText.isNotEmpty()) {
-                    IconButton(
-                        onClick = viewModel::clearInputText,
-                        modifier = Modifier.align(Alignment.Top)
-                    ) {
+                    IconButton(onClick = viewModel::clearInputText) {
                         Icon(
                             painter = painterResource(id = R.drawable.add_2_24),
                             contentDescription = "Clear text",
@@ -250,9 +288,7 @@ fun TranslateInputField(
                 }
             }
 
-            // Секция перевода (только если есть текст)
             if (inputText.isNotEmpty()) {
-                // Кнопки действий
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -273,124 +309,42 @@ fun TranslateInputField(
                     }
                 }
 
-                // Разделитель
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = colorResource(id = R.color.line)
-                )
+                if (primaryTranslation.isNotEmpty()) {
+                    HorizontalDivider(
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = colorResource(id = R.color.line)
+                    )
+                    errorMessage?.let {
+                        Text(text = it, color = Color.Red, modifier = Modifier.padding(8.dp))
+                    }
+                    // Основной перевод
 
-                // Блок с переводом
-                Box(
-                    modifier = Modifier
-                        .heightIn(max = 150.dp)
-                        .fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .verticalScroll(scrollState)
-                    ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                        } else {
-                            Text(
-                                text = translatedText,
-                                fontSize = fontSize,
-                                color = Color.Black,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp)
-                            )
-                        }
+                    Text(primaryTranslation, fontSize = fontSize, modifier = Modifier.padding(8.dp))
+
+                    // Кнопка прослушивания перевода
+                    IconButton(onClick = { /* Прослушивание перевода */ }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.volium),
+                            contentDescription = "Play translation",
+                            tint = Color.Black
+                        )
                     }
                 }
-
-                // Кнопка прослушивания перевода
-                IconButton(onClick = { /* Прослушивание перевода */ }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.volium),
-                        contentDescription = "Play translation",
-                        tint = Color.Black
-                    )
-                }
             }
         }
     }
 }
 
-
 @Composable
-fun AdditionalTranslations(translations: List<String>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        translations.forEach { translation ->
-            Text(
-                text = translation,
-                fontSize = 16.sp,
-                color = Color.Black,
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-            )
-        }
-    }
-}
-
-
-@Composable
-private fun TranslationHistory() {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.translation_history),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            Icon(
-                painterResource(id = R.drawable.arrow_down),
-                contentDescription = "Show More",
-                tint = Color.Black,
-            )
-        }
-        LazyColumn {
-            items(5) {
-                TranslationHistoryItem(wordPair = Pair("Word", "Слово"))
-            }
-        }
-    }
-}
-
-
-@Composable
-private fun TranslationHistoryItem(wordPair: Pair<String, String>) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .background(colorResource(id = R.color.grey_graph), shape = RoundedCornerShape(8.dp))
-            .padding(8.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = wordPair.first,
-                fontSize = 16.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = wordPair.second,
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-        }
-    }
+private fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        color = Color.Black,
+        modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+    )
 }
 
 @Composable

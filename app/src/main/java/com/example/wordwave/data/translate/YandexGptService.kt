@@ -3,33 +3,35 @@ package com.example.wordwave.data.translate
 import com.example.wordwave.BuildConfig
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.gson.*
+import io.ktor.client.engine.okhttp.*
 
 class YandexGptService {
-    private val client = HttpClient(CIO) {
+
+    private val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             gson()
         }
         install(Logging) {
-            level = LogLevel.HEADERS
+            level = LogLevel.BODY
         }
     }
 
-    suspend fun translateText(
-        text: String
-    ): LibreTranslateApi<String> {
+    suspend fun generateExamples(word: String): LibreTranslateApi<List<String>> {
         val apiKey = BuildConfig.API_KEY
         val folderId = BuildConfig.FOLDER_ID
 
         return try {
             val prompt = """
-                Ты профессиональный переводчик. Переведи слово или фразу "$text" с английского на русский язык.
-                Дай только основной перевод.
+                Ты профессиональный писатель-переводчик.
+                Придумай 5 коротких примеров использования слова "$word" в английских предложениях с переводом на русский.
+                Формат ответа строго:
+                1. Example in English — Перевод.
+                2. ...
             """.trimIndent()
 
             val request = GptRequest(
@@ -48,10 +50,15 @@ class YandexGptService {
                 setBody(request)
             }.body()
 
-            val translation = response.result?.alternatives?.firstOrNull()?.message?.text
-                ?: "Не удалось получить перевод"
+            val rawText = response.result?.alternatives?.firstOrNull()?.message?.text
+                ?: return LibreTranslateApi.Failure(Exception("Пустой ответ от GPT"))
 
-            LibreTranslateApi.Success(translation)
+            val examples = rawText.lines()
+                .map { it.trim() }
+                .filter { it.matches(Regex("""\d+\..+—.+""")) }
+
+            LibreTranslateApi.Success(examples)
+
         } catch (e: Exception) {
             LibreTranslateApi.Failure(e)
         }
