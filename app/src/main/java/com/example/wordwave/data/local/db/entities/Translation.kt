@@ -6,19 +6,17 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
+    tableName = "translations",
     foreignKeys = [ForeignKey(
-        entity = Language::class,
+        entity = Word::class,
         parentColumns = ["id"],
-        childColumns = ["languageId"],
+        childColumns = ["wordId"],
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index("languageId")]
+    indices = [Index(value = ["wordId"])]
 )
-data class Word(
+data class Translation(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val languageId: Int,
-    val word: String,
-    val example: String?,
-    val imageUrl: String?,
-    val progress: Int
+    val wordId: Int,
+    val value: String
 )

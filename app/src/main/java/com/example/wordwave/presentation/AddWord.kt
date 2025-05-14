@@ -14,9 +14,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 import com.example.wordwave.presentation.ViewModel
 
@@ -64,7 +66,6 @@ fun AddWordScreen(navController: NavHostController, viewModel: ViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(navController: NavHostController, viewModel: ViewModel) {
-    val scope = rememberCoroutineScope()
 
     TopAppBar(
         title = {
@@ -96,10 +97,9 @@ private fun TopBar(navController: NavHostController, viewModel: ViewModel) {
             IconButton(
                 onClick =
                     {
-                        //viewModel.addSampleData()
+                        viewModel.addSampleData()
                     })
             {
-
                 Icon(
                     painterResource(R.drawable.tick),
                     contentDescription = "add",

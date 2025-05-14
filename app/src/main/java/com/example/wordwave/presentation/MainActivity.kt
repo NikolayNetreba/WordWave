@@ -1,5 +1,6 @@
 package com.example.wordwave.presentation
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -48,8 +49,8 @@ fun AllApp(DviewModel: ViewModel, TviewModel: TranslationViewModel) {
 
     NavHost(navController = navController, startDestination = "home_screen") {
         composable("home_screen") { HomePageScreen(navController) }
-        composable("vocabulary_screen") { VocabularyScreen(navController) }
-        composable("add_word_screen") { AddWordScreen(navController, DviewModel) }
+        composable("vocabulary_screen") { VocabularyScreen(navController, DviewModel) }
+        composable("add_word_screen") { AddWordScreen(navController, DviewModel  ) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }
     }
 }

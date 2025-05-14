@@ -8,7 +8,7 @@ import com.example.wordwave.data.local.db.entities.Language
 @Dao
 interface LanguageDao {
     @Upsert()
-    suspend fun insertLanguage(language: Language)
+    suspend fun upsertLanguage(language: Language)
 
     @Query("SELECT * FROM Language WHERE userId = :userId")
     suspend fun getLanguagesByUser(userId: String): List<Language>
