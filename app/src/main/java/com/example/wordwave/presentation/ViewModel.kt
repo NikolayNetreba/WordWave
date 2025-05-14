@@ -13,6 +13,7 @@ import com.example.wordwave.data.translate.LibreTranslateApi
 import com.example.wordwave.data.translate.YandexGptService
 import com.example.wordwave.data.local.db.AppDatabase
 import com.example.wordwave.data.local.db.DictionaryRepository
+import com.example.wordwave.data.local.db.WordWithTranslations
 import com.example.wordwave.data.translate.Definition
 import com.example.wordwave.data.translate.YandexDictionaryService
 import com.example.wordwave.data.translate.YandexTranslateService
@@ -21,15 +22,77 @@ import com.example.wordwave.data.translate.onSuccess
 import kotlinx.coroutines.flow.*
 
 class ViewModel(application: Application) : AndroidViewModel(application) {
-    private val db = AppDatabase.Companion.getDatabase(application)
-    private val repo = DictionaryRepository(db.userDao(), db.languageDao(), db.wordDao())
+    private val db = AppDatabase.getDatabase(application)
+    private val repo = DictionaryRepository(db.userDao(), db.languageDao(), db.dictionaryDao())
 
     var words by mutableStateOf<List<Word>>(emptyList())
         private set
 
-    fun loadWords(languageId: Int) {
+    var wordsWithTranslations by mutableStateOf<List<WordWithTranslations>>(emptyList())
+        private set
+
+    var languages by mutableStateOf<List<Language>>(emptyList())
+        private set
+
+    fun updateWords(languageId: Int) {
         viewModelScope.launch {
             words = repo.getWords(languageId)
+        }
+    }
+
+    fun updateWordsWithTranslations(languageId: Int) {
+        viewModelScope.launch {
+            wordsWithTranslations = repo.getWordsWithTranslations(languageId)
+        }
+    }
+
+    fun updateLanguages(userId: String) {
+        viewModelScope.launch {
+            languages = repo.getLanguages(userId)
+        }
+    }
+
+    fun updateAll(userId: String) {
+        viewModelScope.launch {
+            updateLanguages(userId)
+
+            for (language in languages) {
+                updateWords(language.id)
+            }
+        }
+    }
+
+    fun addWordWithTranslations(word: String, translations: List<String>) {
+        viewModelScope.launch {
+            repo.upsertWordWithTranslations(
+                Word(
+                    languageId = 1,
+                    word = word,
+                    example = "null",
+                    imageUrl = null,
+                    progress = 0
+                ),
+                translations
+            )
+
+            updateWordsWithTranslations(1)
+        }
+    }
+
+    fun addWordWithTranslation(word: String, translation: String) {
+        viewModelScope.launch {
+            repo.upsertWordWithTranslations(
+                Word(
+                    languageId = 1,
+                    word = word,
+                    example = "null",
+                    imageUrl = null,
+                    progress = 0
+                ),
+                listOf(translation)
+            )
+
+            updateWordsWithTranslations(1)
         }
     }
 
@@ -40,19 +103,6 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
 
             val lang = Language(userId = "u0", name = "English", code = "en")
             repo.upsertLanguage(lang)
-
-            val langs = repo.getLanguages("u0")
-            val word = Word(
-                languageId = langs[0].id,
-                word = "apple",
-                translation = "яблоко",
-                example = "I ate an apple.",
-                imageUrl = null,
-                progress = 0
-            )
-
-            repo.upsertWord(word)
-            loadWords(langs[0].id)
         }
     }
 
@@ -60,10 +110,11 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repo.updateProgress(wordId, newProgress)
             val currentLangId = words.firstOrNull()?.languageId ?: return@launch
-            loadWords(currentLangId)
+            updateWords(currentLangId)
         }
     }
 }
+
 
 class TranslationViewModel : ViewModel() {
     val definitions = MutableStateFlow<List<Definition>>(emptyList())
