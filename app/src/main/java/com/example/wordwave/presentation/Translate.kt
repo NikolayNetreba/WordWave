@@ -308,7 +308,7 @@ fun TranslateInputField(
                     modifier = Modifier.weight(1f),
                     colors = TextFieldDefaults.colors(
                         focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Gray,
+                        unfocusedTextColor = Color.Black,
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
                         cursorColor = Color.Black,
