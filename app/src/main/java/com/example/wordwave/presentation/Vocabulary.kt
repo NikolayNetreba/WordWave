@@ -23,9 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.wordwave.R
+<<<<<<< Updated upstream
 import com.example.wordwave.presentation.db.DictionaryViewModel
 import com.example.wordwave.presentation.db.WordWithTranslations
 import com.example.wordwave.presentation.db.entities.Word
+=======
+import com.example.wordwave.data.local.db.WordWithTranslations
+>>>>>>> Stashed changes
 
 
 @Composable

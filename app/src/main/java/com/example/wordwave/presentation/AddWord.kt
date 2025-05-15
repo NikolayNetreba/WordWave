@@ -18,7 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.wordwave.R
+<<<<<<< Updated upstream
 import com.example.wordwave.presentation.db.DictionaryViewModel
+=======
+>>>>>>> Stashed changes
 
 @Composable
 fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewModel) {
@@ -64,12 +67,17 @@ fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewMod
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+<<<<<<< Updated upstream
 private fun TopBar(
     navController: NavHostController,
     viewModel: DictionaryViewModel,
     inputText: String,
     translation: String
 ) {
+=======
+private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
+
+>>>>>>> Stashed changes
     TopAppBar(
         title = {
             Box(
