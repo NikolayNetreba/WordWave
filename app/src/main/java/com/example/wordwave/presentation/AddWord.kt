@@ -1,5 +1,7 @@
 package com.example.wordwave.presentation
 
+import android.app.Application
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,10 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 import com.example.wordwave.presentation.ViewModel
+import kotlin.getValue
 
 @Composable
 fun AddWordScreen(navController: NavHostController, viewModel: ViewModel) {
@@ -255,9 +259,10 @@ private fun ExampleUsageSection() {
     }
 }
 
-/*@Composable
+@Composable
 @Preview(showSystemUi = true)
 private fun PreviewAddWord() {
     val navController = rememberNavController()
-    AddWordScreen(navController, null)
-}*/
+    val viewModel: ViewModel = viewModel()
+    AddWordScreen(navController, viewModel)
+}

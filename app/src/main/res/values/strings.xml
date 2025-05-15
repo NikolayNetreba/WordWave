@@ -2,7 +2,7 @@
     <string name="app_name">WordWave</string>
     <string name="bar_title">Английский</string>
     <string name="all_word">Все слова</string>
-    <string name="game_table_title">Упражнения</string>
+    <string name="game_table_title">Тренировки</string>
     <string name="vocabulary_title">Словарь</string>
     <string name="add_word_title">Новое слово</string>
     <string name="translation_history">История перевода</string>

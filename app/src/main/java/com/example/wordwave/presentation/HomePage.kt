@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -41,7 +42,7 @@ fun HomePageScreen(navController: NavHostController) {
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
                 Diagrams()
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
-                //GamesTable()
+                GamesTable(navController)
             }
         },
         containerColor = Color.White
@@ -101,7 +102,7 @@ fun AllWordButton(navController: NavHostController) {
             contentDescription = "Arrow",
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 16.dp)
+                .padding(end = 16.dp),
         )
     }
 }
@@ -119,23 +120,66 @@ fun Diagrams() {
 }
 
 @Composable
-fun GamesTable() {
-    Box(
+fun GamesTable(navController: NavHostController) {
+    Column(
         modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
             .padding(16.dp)
-            .fillMaxSize()
-            .clip(RoundedCornerShape(12.dp))
-            .background(colorResource(R.color.grey_graph))
     ) {
         Text(
             text = stringResource(R.string.game_table_title),
-            fontSize = 20.sp,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        val games = listOf(
+            Triple("Флеш-карты", R.drawable.flash_cards_icon, "flash_cards_screen"),
+            Triple("Выбрать слово", R.drawable.flash_cards_icon, "choose_word_screen"),
+            Triple("Собрать слово", R.drawable.flash_cards_icon, "build_word_screen"),
+            Triple("Найти пары", R.drawable.flash_cards_icon, "find_pairs_screen")
+        )
+
+        games.forEach { (title, iconRes, route) ->
+            GameButton(title = title, iconRes = iconRes) {
+                navController.navigate(route)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+@Composable
+fun GameButton(title: String, iconRes: Int, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(colorResource(R.color.grey_graph))
+            .clickable { onClick() }
+    ) {
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(10.dp)
+                .align(Alignment.CenterStart)
+                .padding(start = 16.dp)
+        )
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = title,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 16.dp),
+            tint = colorResource(R.color.purple_I)
         )
     }
 }
+
+
 
 @Composable
 fun NavigationBar(navController: NavHostController) {
