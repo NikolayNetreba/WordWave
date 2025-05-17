@@ -7,13 +7,13 @@ import androidx.room.RoomDatabase
 import com.example.wordwave.data.local.db.dao.DictionaryDao
 import com.example.wordwave.data.local.db.dao.LanguageDao
 import com.example.wordwave.data.local.db.dao.UserDao
-import com.example.wordwave.data.local.db.dao.WordDao
 import com.example.wordwave.data.local.db.entities.Language
+import com.example.wordwave.data.local.db.entities.Synonym
 import com.example.wordwave.data.local.db.entities.Translation
 import com.example.wordwave.data.local.db.entities.User
 import com.example.wordwave.data.local.db.entities.Word
 
-@Database(entities = [User::class, Language::class, Word::class, Translation::class], version = 3)
+@Database(entities = [User::class, Language::class, Word::class, Translation::class, Synonym::class], version = 5)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun languageDao(): LanguageDao

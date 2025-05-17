@@ -19,6 +19,7 @@ import com.example.wordwave.data.translate.YandexDictionaryService
 import com.example.wordwave.data.translate.YandexTranslateService
 import com.example.wordwave.data.translate.onFailure
 import com.example.wordwave.data.translate.onSuccess
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 
 class ViewModel(application: Application) : AndroidViewModel(application) {
@@ -35,19 +36,19 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         private set
 
     fun updateWords(languageId: Int) {
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             words = repo.getWords(languageId)
-        }
+        }*/
     }
 
-    fun updateWordsWithTranslations(languageId: Int) {
-        viewModelScope.launch {
-            wordsWithTranslations = repo.getWordsWithTranslations(languageId)
+    fun updateWordsWithTranslations(language: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            wordsWithTranslations = repo.getWords()
         }
     }
 
     fun updateLanguages(userId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             languages = repo.getLanguages(userId)
         }
     }
@@ -62,25 +63,22 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun addWordWithTranslations(word: String, translations: List<String>) {
-        viewModelScope.launch {
+    fun addWordWithTranslations(word: String, translations: Map<String, List<String>>) {
+        viewModelScope.launch(Dispatchers.IO) {
             repo.upsertWordWithTranslations(
                 Word(
-                    languageId = 1,
-                    word = word,
-                    example = "null",
-                    imageUrl = null,
-                    progress = 0
+                    text = word,
+                    language = "en"
                 ),
                 translations
             )
 
-            updateWordsWithTranslations(1)
+            updateWordsWithTranslations("en")
         }
     }
 
     fun addWordWithTranslation(word: String, translation: String) {
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             repo.upsertWordWithTranslations(
                 Word(
                     languageId = 1,
@@ -93,11 +91,11 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
             )
 
             updateWordsWithTranslations(1)
-        }
+        }*/
     }
 
     fun addSampleData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val user = User("u0")
             repo.upsertUser(user)
 
@@ -107,11 +105,11 @@ class ViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateProgress(wordId: Int, newProgress: Int) {
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             repo.updateProgress(wordId, newProgress)
             val currentLangId = words.firstOrNull()?.languageId ?: return@launch
             updateWords(currentLangId)
-        }
+        }*/
     }
 }
 

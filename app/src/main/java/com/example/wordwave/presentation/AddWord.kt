@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.filter
 import kotlin.getValue
 
 @Composable
-fun AddWordScreen(navController: NavHostController, viewModel: FakeViewModel, TviewModel: TranslationViewModel) {
+fun AddWordScreen(navController: NavHostController, viewModel: ViewModel, TviewModel: TranslationViewModel) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -74,7 +74,7 @@ fun AddWordScreen(navController: NavHostController, viewModel: FakeViewModel, Tv
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, viewModel: FakeViewModel) {
+private fun TopBar(navController: NavHostController, viewModel: ViewModel) {
 
     TopAppBar(
         title = {
@@ -106,7 +106,14 @@ private fun TopBar(navController: NavHostController, viewModel: FakeViewModel) {
             IconButton(
                 onClick =
                     {
+                        val map = HashMap<String, List<String>>()
+                        map.put("секс", listOf("porn", "porno", "anal", "masturbate"))
+
                         viewModel.addSampleData()
+                        viewModel.addWordWithTranslations(
+                            "sex",
+                             map
+                        )
                     })
             {
                 Icon(
@@ -293,11 +300,11 @@ private fun ExampleUsageSection(viewModel: TranslationViewModel) {
     }
 }
 
-@Composable
+/*@Composable
 @Preview(showSystemUi = true)
 private fun PreviewAddWord() {
     val navController = rememberNavController()
     val viewModel: FakeViewModel = viewModel()
     val TviewModel: TranslationViewModel = viewModel()
     AddWordScreen(navController, viewModel, TviewModel)
-}
+}*/

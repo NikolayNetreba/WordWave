@@ -59,7 +59,7 @@ fun AllApp(
     NavHost(navController = navController, startDestination = "home_screen") {
         composable("home_screen") { HomePageScreen(navController) }
         composable("vocabulary_screen") { VocabularyScreen(navController, DviewModel) }
-        composable("add_word_screen") { AddWordScreen(navController, FakeViewModel, TviewModel) }
+        composable("add_word_screen") { AddWordScreen(navController, DviewModel, TviewModel) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }
         composable("flash_cards_screen") { FlashCardsScreen(navController, FCviewModel) }
     }
