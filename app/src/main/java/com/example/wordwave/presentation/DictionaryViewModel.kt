@@ -1,6 +1,7 @@
 package com.example.wordwave.presentation
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wordwave.data.local.db.entities.Language
@@ -9,6 +10,7 @@ import com.example.wordwave.data.local.db.entities.Word
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.*
+import androidx.navigation.NavController
 import com.example.wordwave.data.translate.LibreTranslateApi
 import com.example.wordwave.data.translate.YandexGptService
 import com.example.wordwave.data.local.db.AppDatabase
@@ -21,8 +23,10 @@ import com.example.wordwave.data.translate.onFailure
 import com.example.wordwave.data.translate.onSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlin.math.min
+import kotlin.random.Random
 
-class ViewModel(application: Application) : AndroidViewModel(application) {
+class DictionaryViewModel(application: Application) : AndroidViewModel(application) {
     private val db = AppDatabase.getDatabase(application)
     private val repo = DictionaryRepository(db.userDao(), db.languageDao(), db.dictionaryDao())
 
@@ -169,7 +173,8 @@ class TranslationViewModel : ViewModel() {
             try {
                 when (val response = translateService.translate(word, from, to)) {
                     is LibreTranslateApi.Success<*> -> primaryTranslation.value = response.data.toString()
-                    is LibreTranslateApi.Failure -> _errorMessage.value = "Ошибка перевода: ${response.exception.localizedMessage}"
+                    is LibreTranslateApi.Failure -> _errorMessage.value =
+                        "Ошибка перевода: ${response.exception.localizedMessage}"
                 }
 
                 dictionaryService.lookup(word, from, to).onSuccess { response ->
@@ -191,7 +196,8 @@ class TranslationViewModel : ViewModel() {
 
                 when (val gptResponse = gptService.generateExamples(word, from, to)) {
                     is LibreTranslateApi.Success -> examples.value = gptResponse.data
-                    is LibreTranslateApi.Failure -> _errorMessage.value = "Ошибка GPT: ${gptResponse.exception.localizedMessage}"
+                    is LibreTranslateApi.Failure -> _errorMessage.value =
+                        "Ошибка GPT: ${gptResponse.exception.localizedMessage}"
                 }
 
             } catch (e: Exception) {
@@ -240,35 +246,41 @@ class TranslationViewModel : ViewModel() {
     }
 }
 
-data class TWord(
-    val word: String,
-    val translation: String
-)
+const val WORDS_NUM = 10
 
-class FlashCardsViewModel : ViewModel() {
-    private val _words = listOf(
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука"),
-        TWord("hello", "сука")
-    ).shuffled().take(10)
+class FlashCardsViewModel() : ViewModel() {
+    lateinit var navController: NavController
+    lateinit var dictionaryViewModel: DictionaryViewModel
+
+    var wordsNum = 0
+
+    private lateinit var words: List<Pair<String, String>>
 
     private val _currentIndex = mutableStateOf(0)
     private val _isFlipped = mutableStateOf(false)
 
-    val currentWord: TWord
-        get() = _words[_currentIndex.value]
+    val currentWord: Pair<String, String>
+        get() = words[_currentIndex.value]
 
     val cardIndex: State<Int> = _currentIndex
     val isFlipped: State<Boolean> = _isFlipped
+
+    fun initialize() {
+        words = emptyList()
+        dictionaryViewModel.updateWordsWithTranslations("en")
+        wordsNum = min(dictionaryViewModel.wordsWithTranslations.size, WORDS_NUM)
+        val wordsWithTranslations = dictionaryViewModel.wordsWithTranslations.shuffled().take(wordsNum)
+
+        for (i in 0..wordsNum - 1) {
+            words += Pair(
+                wordsWithTranslations[i].word.text,
+                wordsWithTranslations[i].translations[Random.nextInt(
+                    0,
+                    wordsWithTranslations[i].translations.size
+                )].translation.translatedText
+            )
+        }
+    }
 
     fun flipCard() {
         _isFlipped.value = !_isFlipped.value
@@ -279,17 +291,17 @@ class FlashCardsViewModel : ViewModel() {
     }
 
     fun onDontRememberClicked() {
-
     }
 
     fun nextCard() {
         // Сбрасываем переворот
         _isFlipped.value = false
         // Переходим к следующей
-        if (_currentIndex.value < _words.lastIndex) {
+        if (_currentIndex.value < words.lastIndex) {
             _currentIndex.value += 1
         } else {
-            // Последняя карточка — можно обработать окончание игры
+            navController.popBackStack();
+            _currentIndex.value = 0
         }
     }
 }

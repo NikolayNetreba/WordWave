@@ -26,7 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 
 @Composable
-fun HomePageScreen(navController: NavHostController) {
+fun HomePageScreen(navController: NavHostController, viewModel: FlashCardsViewModel) {
     Scaffold(
         topBar = { TopBar(navController, "Английский") },
         bottomBar = { NavigationBar(navController)},
@@ -42,7 +42,7 @@ fun HomePageScreen(navController: NavHostController) {
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
                 Diagrams()
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
-                GamesTable(navController)
+                GamesTable(navController, viewModel)
             }
         },
         containerColor = Color.White
@@ -120,7 +120,7 @@ fun Diagrams() {
 }
 
 @Composable
-fun GamesTable(navController: NavHostController) {
+fun GamesTable(navController: NavHostController, viewModel: FlashCardsViewModel) {
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -144,6 +144,7 @@ fun GamesTable(navController: NavHostController) {
         games.forEach { (title, iconRes, route) ->
             GameButton(title = title, iconRes = iconRes) {
                 navController.navigate(route)
+                viewModel.initialize()
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -216,9 +217,9 @@ fun NavigationBar(navController: NavHostController) {
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun HomePageScreenPreview() {
     val navController = rememberNavController()
     HomePageScreen(navController = navController)
-}
+}*/

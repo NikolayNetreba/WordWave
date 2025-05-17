@@ -1,7 +1,5 @@
 package com.example.wordwave.presentation
 
-import android.app.Application
-import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
@@ -18,23 +15,18 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
-import com.example.wordwave.presentation.ViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlin.getValue
 
 @Composable
-fun AddWordScreen(navController: NavHostController, viewModel: ViewModel, TviewModel: TranslationViewModel) {
+fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewModel, TviewModel: TranslationViewModel) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -74,7 +66,7 @@ fun AddWordScreen(navController: NavHostController, viewModel: ViewModel, TviewM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, viewModel: ViewModel) {
+private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
 
     TopAppBar(
         title = {
@@ -107,11 +99,11 @@ private fun TopBar(navController: NavHostController, viewModel: ViewModel) {
                 onClick =
                     {
                         val map = HashMap<String, List<String>>()
-                        map.put("секс", listOf("porn", "porno", "anal", "masturbate"))
+                        map.put("гора", listOf("porn", "porno", "anal", "masturbate"))
+                        map.put("скала", listOf("porn", "porno", "anal", "masturbate"))
 
-                        viewModel.addSampleData()
                         viewModel.addWordWithTranslations(
-                            "sex",
+                            "mountain",
                              map
                         )
                     })

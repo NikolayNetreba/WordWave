@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.wordwave.presentation.FlashCardsViewModel
+import com.example.wordwave.presentation.WORDS_NUM
 
 @Composable
 fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsViewModel) {
@@ -65,33 +65,30 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                 ) {
                     if (!showBack) {
                         Text(
-                            text = currentWord.word,
+                            text = currentWord.first,
                             style = MaterialTheme.typography.headlineMedium
                         )
                     } else {
-                        Column(
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .graphicsLayer { scaleX = -1f },
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.SpaceBetween
+                                .graphicsLayer { scaleX = -1f }
                         ) {
-                            // Перевод теперь того же размера и по центру
+                            // Центрированный перевод
                             Text(
-                                text = currentWord.translation,
+                                text = currentWord.second,
                                 style = MaterialTheme.typography.headlineMedium,
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
+                                modifier = Modifier.align(Alignment.Center)
                             )
 
+                            // Кнопки снизу
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 16.dp)
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 24.dp)
                             ) {
-                                Spacer(modifier = Modifier.weight(1f))
                                 Button(onClick = {
                                     viewModel.onRememberClicked()
                                     viewModel.flipCard()
@@ -104,9 +101,8 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                                     viewModel.flipCard()
                                     viewModel.nextCard()
                                 }) {
-                                    Text("Не помню")
+                                    Text("Забыл")
                                 }
-                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }
@@ -121,7 +117,7 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                 .align(Alignment.BottomCenter)
         ) {
             Text(
-                text = "${index + 1}/10",
+                text = "${index + 1}/${viewModel.wordsNum}",
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.align(Alignment.Center),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)

@@ -23,13 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.wordwave.R
-import com.example.wordwave.presentation.ViewModel
 import com.example.wordwave.data.local.db.WordWithTranslations
-import com.example.wordwave.data.local.db.entities.Word
 
 
 @Composable
-fun VocabularyScreen(navController: NavHostController, viewModel: ViewModel) {
+fun VocabularyScreen(navController: NavHostController, viewModel: DictionaryViewModel) {
     /*val words: List<Pair<String, String>> = listOf(
         "hi" to "Привет",
         "bye" to "Пока",
