@@ -23,9 +23,14 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     private val viewModel: DictionaryViewModel by viewModels()
 =======
     private val DviewModel: DictionaryViewModel by viewModels()
+=======
+    private val FCviewModel: FlashCardsViewModel by viewModels()
+    private val DviewModel: ViewModel by viewModels()
+>>>>>>> Stashed changes
     private val TviewModel: TranslationViewModel by viewModels()
     private val CardGameViewModel: CardGameViewModel by viewModels()
 >>>>>>> Stashed changes

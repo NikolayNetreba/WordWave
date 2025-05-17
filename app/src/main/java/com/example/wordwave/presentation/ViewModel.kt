@@ -1,25 +1,23 @@
 package com.example.wordwave.presentation
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.wordwave.data.local.db.entities.Language
-import com.example.wordwave.data.local.db.entities.User
-import com.example.wordwave.data.local.db.entities.Word
-import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.*
-import com.example.wordwave.data.translate.LibreTranslateApi
-import com.example.wordwave.data.translate.YandexGptService
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.wordwave.data.local.db.AppDatabase
 import com.example.wordwave.data.local.db.DictionaryRepository
 import com.example.wordwave.data.local.db.WordWithTranslations
+import com.example.wordwave.data.local.db.entities.Language
+import com.example.wordwave.data.local.db.entities.User
+import com.example.wordwave.data.local.db.entities.Word
 import com.example.wordwave.data.translate.Definition
+import com.example.wordwave.data.translate.LibreTranslateApi
 import com.example.wordwave.data.translate.YandexDictionaryService
+import com.example.wordwave.data.translate.YandexGptService
 import com.example.wordwave.data.translate.YandexTranslateService
-import com.example.wordwave.data.translate.onFailure
-import com.example.wordwave.data.translate.onSuccess
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class DictionaryViewModel(application: Application) : AndroidViewModel(application) {
     private val db = AppDatabase.getDatabase(application)
