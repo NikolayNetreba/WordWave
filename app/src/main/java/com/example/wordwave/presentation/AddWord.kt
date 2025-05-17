@@ -10,7 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -24,10 +26,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 import com.example.wordwave.presentation.ViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlin.getValue
 
 @Composable
-fun AddWordScreen(navController: NavHostController, viewModel: ViewModel) {
+fun AddWordScreen(navController: NavHostController, viewModel: FakeViewModel, TviewModel: TranslationViewModel) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -55,11 +62,9 @@ fun AddWordScreen(navController: NavHostController, viewModel: ViewModel) {
                     item {
                         ImageUploadSection()
                         Spacer(modifier = Modifier.height(16.dp))
-                        WordInputSection(inputText = inputText, setInputText = setInputText)
+                        WordInputSection(TviewModel)
                         Spacer(modifier = Modifier.height(16.dp))
-                        TranslationSection()
-                        Spacer(modifier = Modifier.height(16.dp))
-                        ExampleUsageSection()
+                        ExampleUsageSection(TviewModel)
                     }
                 }
             }
@@ -69,7 +74,7 @@ fun AddWordScreen(navController: NavHostController, viewModel: ViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, viewModel: ViewModel) {
+private fun TopBar(navController: NavHostController, viewModel: FakeViewModel) {
 
     TopAppBar(
         title = {
@@ -138,84 +143,150 @@ private fun ImageUploadSection() {
     }
 }
 
+@OptIn(FlowPreview::class)
 @Composable
-private fun WordInputSection(inputText: String, setInputText: (String) -> Unit) {
-    var localInputText by remember { mutableStateOf(inputText) }
+private fun WordInputSection(viewModel: TranslationViewModel,) {
+    val inputText by viewModel.inputText.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    LaunchedEffect(inputText) {
+        snapshotFlow { inputText }
+            .debounce(250)
+            .filter { it.isNotBlank() }
+            .distinctUntilChanged()
+            .collectLatest {
+                viewModel.translateWord()
+            }
+    }
+
+    val fontSize = with(LocalDensity.current) {
+        when {
+            inputText.length < 30 -> 24.sp
+            inputText.length < 60 -> 22.sp
+            else -> 20.sp
+        }
+    }
+
     TextField(
-        value = localInputText,
-        onValueChange = {
-            localInputText = it
-            setInputText(it) // Обновляем родительский state
-        },
-        label = { Text("Слово") },
+        value = inputText,
+        onValueChange = viewModel::updateInputText,
+        placeholder = { Text("Введите текст") },
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
             focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Gray,
+            unfocusedTextColor = Color.Black,
             focusedContainerColor = colorResource(R.color.grey_graph),
             unfocusedContainerColor = colorResource(R.color.grey_graph),
             cursorColor = Color.Black,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         ),
+        textStyle = LocalTextStyle.current.copy(fontSize = fontSize),
+        singleLine = true,
         trailingIcon = {
-            Row {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painterResource(R.drawable.volium),
-                        tint = Color.Black,
-                        contentDescription = "Play Sound"
-                    )
-                }
-                IconButton(onClick = { localInputText = ""; setInputText("") }) {
-                    Icon(
-                        painterResource(R.drawable.close_icon),
-                        tint = Color.Black,
-                        contentDescription = "Clear"
-                    )
+            if(inputText.isNotEmpty()) {
+                Row {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painterResource(R.drawable.volium),
+                            tint = Color.Black,
+                            contentDescription = "Play Sound"
+                        )
+                    }
+                    IconButton(onClick = viewModel::clearInputText) {
+                        Icon(
+                            painter = painterResource(R.drawable.close_icon),
+                            contentDescription = "Clear text",
+                            tint = Color.Black,
+                        )
+                    }
                 }
             }
         },
     )
+    if(inputText.isNotEmpty()) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val addTranslate = ""
+        Column {
+            TextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("Добавить свой перевод") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedContainerColor = colorResource(R.color.grey_graph),
+                    unfocusedContainerColor = colorResource(R.color.grey_graph),
+                    cursorColor = Color.Black,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                trailingIcon = {
+                    if (addTranslate.isNotEmpty()) {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                painterResource(R.drawable.close_icon),
+                                tint = Color.Black,
+                                contentDescription = "Clear"
+                            )
+                        }
+                    }
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colorResource(R.color.grey_graph), RoundedCornerShape(8.dp))
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = "Слово [транскрипция] сущ\n1 перевод",
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+            }
+        }
+    }
 }
 
 @Composable
-private fun TranslationSection() {
-    Column {
-        TextField(
-            value = "",
-            onValueChange = {},
-            label = { Text("Добавить свой перевод") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Gray,
-                focusedContainerColor = colorResource(R.color.grey_graph),
-                unfocusedContainerColor = colorResource(R.color.grey_graph),
-                cursorColor = Color.Black,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            trailingIcon = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painterResource(R.drawable.close_icon),
-                        tint = Color.Black,
-                        contentDescription = "Clear"
-                    )
+private fun ExampleUsageSection(viewModel: TranslationViewModel) {
+    val inputText by viewModel.inputText.collectAsState()
+    if(inputText.isNotEmpty()) {
+        Column {
+            TextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("Добавить свой пример") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
+                    focusedContainerColor = colorResource(R.color.grey_graph),
+                    unfocusedContainerColor = colorResource(R.color.grey_graph),
+                    cursorColor = Color.Black,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                trailingIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            painterResource(R.drawable.close_icon),
+                            tint = Color.Black,
+                            contentDescription = "Clear"
+                        )
+                    }
                 }
-            }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(colorResource(R.color.grey_graph), RoundedCornerShape(8.dp))
-                .padding(8.dp)
-        ) {
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Слово [транскрипция] сущ\n1 перевод",
+                text = "Примеры использования",
                 fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
                 color = Color.Black
             )
         }
@@ -223,46 +294,10 @@ private fun TranslationSection() {
 }
 
 @Composable
-private fun ExampleUsageSection() {
-    Column {
-        TextField(
-            value = "",
-            onValueChange = {},
-            label = { Text("Добавить свой пример") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Gray,
-                focusedContainerColor = colorResource(R.color.grey_graph),
-                unfocusedContainerColor = colorResource(R.color.grey_graph),
-                cursorColor = Color.Black,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            trailingIcon = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        painterResource(R.drawable.close_icon),
-                        tint = Color.Black,
-                        contentDescription = "Clear"
-                    )
-                }
-            }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Примеры использования",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Black
-        )
-    }
-}
-
-@Composable
 @Preview(showSystemUi = true)
 private fun PreviewAddWord() {
     val navController = rememberNavController()
-    val viewModel: ViewModel = viewModel()
-    AddWordScreen(navController, viewModel)
+    val viewModel: FakeViewModel = viewModel()
+    val TviewModel: TranslationViewModel = viewModel()
+    AddWordScreen(navController, viewModel, TviewModel)
 }

@@ -241,3 +241,63 @@ class TranslationViewModel : ViewModel() {
         translateWord()
     }
 }
+
+data class TWord(
+    val word: String,
+    val translation: String
+)
+
+class FlashCardsViewModel : ViewModel() {
+    private val _words = listOf(
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука"),
+        TWord("hello", "сука")
+    ).shuffled().take(10)
+
+    private val _currentIndex = mutableStateOf(0)
+    private val _isFlipped = mutableStateOf(false)
+
+    val currentWord: TWord
+        get() = _words[_currentIndex.value]
+
+    val cardIndex: State<Int> = _currentIndex
+    val isFlipped: State<Boolean> = _isFlipped
+
+    fun flipCard() {
+        _isFlipped.value = !_isFlipped.value
+    }
+
+    fun onRememberClicked() {
+
+    }
+
+    fun onDontRememberClicked() {
+
+    }
+
+    fun nextCard() {
+        // Сбрасываем переворот
+        _isFlipped.value = false
+        // Переходим к следующей
+        if (_currentIndex.value < _words.lastIndex) {
+            _currentIndex.value += 1
+        } else {
+            // Последняя карточка — можно обработать окончание игры
+        }
+    }
+}
+
+class FakeViewModel : ViewModel() {
+    fun addSampleData() {
+
+    }
+}

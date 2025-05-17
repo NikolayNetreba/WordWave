@@ -76,67 +76,70 @@ fun TranslateScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                val inputText by viewModel.inputText.collectAsState()
                 val definitions by viewModel.definitions.collectAsState()
                 val examples by viewModel.examples.collectAsState()
-                // Блок с дополнительными переводами и примерами
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White)
-                        .padding(horizontal = 12.dp)
-                        .padding(top = 12.dp)
-                ) {
-                    definitions.forEach { def ->
-                        item {
-                            val title = buildString {
-                                append(def.text)
-                                def.pos?.let { append(" [$it]") }
-                            }
-                            SectionTitle(title)
-                        }
 
-                        items(def.tr.size) { index ->
-                            val tr = def.tr[index]
-                            Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
-                                val allSynonyms = buildList {
-                                    add(tr.text)
-                                    tr.syn?.forEach { add(it.text) }
+                if(inputText.isNotEmpty()) {
+                    // Блок с дополнительными переводами и примерами
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White)
+                            .padding(horizontal = 12.dp)
+                            .padding(top = 12.dp)
+                    ) {
+                        definitions.forEach { def ->
+                            item {
+                                val title = buildString {
+                                    append(def.text)
+                                    def.pos?.let { append(" [$it]") }
                                 }
+                                SectionTitle(title)
+                            }
 
-                                Text(
-                                    "${index + 1}. " + allSynonyms.joinToString(", "),
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp
-                                )
+                            items(def.tr.size) { index ->
+                                val tr = def.tr[index]
+                                Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
+                                    val allSynonyms = buildList {
+                                        add(tr.text)
+                                        tr.syn?.forEach { add(it.text) }
+                                    }
 
-                                tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
                                     Text(
-                                        meanings.joinToString(", ") { it.text },
-                                        color = Color.Gray,
-                                        fontSize = 12.sp,
-                                        softWrap = true
+                                        "${index + 1}. " + allSynonyms.joinToString(", "),
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 16.sp
                                     )
+
+                                    tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
+                                        Text(
+                                            meanings.joinToString(", ") { it.text },
+                                            color = Color.Gray,
+                                            fontSize = 12.sp,
+                                            softWrap = true
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    if (examples.isNotEmpty()) {
-                        item {
-                            SectionTitle("Примеры")
-                        }
+                        if (examples.isNotEmpty()) {
+                            item {
+                                SectionTitle("Примеры")
+                            }
 
-                        items(examples.size) { i ->
-                            Text(
-                                "• ${examples[i]}",
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
+                            items(examples.size) { i ->
+                                Text(
+                                    "• ${examples[i]}",
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                            }
                         }
                     }
                 }
-
             }
         }
     )
@@ -268,7 +271,6 @@ fun TranslateInputField(
     val errorMessage by viewModel.errorMessage.collectAsState()
     val primaryTranslation by viewModel.primaryTranslation.collectAsState()
 
-    //val keyboardController = LocalSoftwareKeyboardController.current
     val fontSize = with(LocalDensity.current) {
         when {
             inputText.length < 30 -> 24.sp
@@ -323,19 +325,20 @@ fun TranslateInputField(
 //                            keyboardController?.hide()
 //                        }
 //                    ),
-                    singleLine = true
-                )
-
-                if (inputText.isNotEmpty()) {
-                    IconButton(onClick = viewModel::clearInputText) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.add_2_24),
-                            contentDescription = "Clear text",
-                            tint = Color.Black,
-                            modifier = Modifier.rotate(45f)
-                        )
+                    singleLine = true,
+                    trailingIcon = {
+                        if (inputText.isNotEmpty()) {
+                            IconButton(onClick = viewModel::clearInputText) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.add_2_24),
+                                    contentDescription = "Clear text",
+                                    tint = Color.Black,
+                                    modifier = Modifier.rotate(45f)
+                                )
+                            }
+                        }
                     }
-                }
+                )
             }
 
             if (inputText.isNotEmpty()) {

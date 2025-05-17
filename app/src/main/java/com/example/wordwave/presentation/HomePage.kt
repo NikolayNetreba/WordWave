@@ -135,7 +135,7 @@ fun GamesTable(navController: NavHostController) {
         )
 
         val games = listOf(
-            Triple("Флеш-карты", R.drawable.flash_cards_icon, "flash_cards_screen"),
+            Triple("Флеш-карточки", R.drawable.flash_cards_icon, "flash_cards_screen"),
             Triple("Выбрать слово", R.drawable.flash_cards_icon, "choose_word_screen"),
             Triple("Собрать слово", R.drawable.flash_cards_icon, "build_word_screen"),
             Triple("Найти пары", R.drawable.flash_cards_icon, "find_pairs_screen")
