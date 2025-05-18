@@ -259,8 +259,8 @@ class FlashCardsViewModel() : ViewModel() {
     private val _currentIndex = mutableStateOf(0)
     private val _isFlipped = mutableStateOf(false)
 
-    val currentWord: Pair<String, String>
-        get() = words[_currentIndex.value]
+    val currentWord: Pair<String, String>?
+        get() = if (words.isEmpty()) null else words[_currentIndex.value]
 
     val cardIndex: State<Int> = _currentIndex
     val isFlipped: State<Boolean> = _isFlipped
@@ -282,15 +282,33 @@ class FlashCardsViewModel() : ViewModel() {
         }
     }
 
+    fun getAllTranslationsForCurrentWord(): List<String> {
+        var list: List<String> = emptyList()
+        for (wwt in dictionaryViewModel.wordsWithTranslations) {
+            if (wwt.word.text != currentWord?.first) {
+                continue;
+            }
+
+            for (translation in wwt.translations) {
+                list += translation.translation.translatedText;
+            }
+        }
+
+        return list
+    }
+
     fun flipCard() {
         _isFlipped.value = !_isFlipped.value
     }
 
     fun onRememberClicked() {
-
+        flipCard()
+        nextCard()
     }
 
     fun onDontRememberClicked() {
+        flipCard()
+        nextCard()
     }
 
     fun nextCard() {
