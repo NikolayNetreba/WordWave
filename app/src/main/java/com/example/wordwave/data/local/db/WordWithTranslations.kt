@@ -9,7 +9,8 @@ data class WordWithTranslations(
     @Embedded val word: Word,
     @Relation(
         parentColumn = "id",
-        entityColumn = "wordId"
+        entityColumn = "wordId",
+        entity = Translation::class
     )
-    val translations: List<Translation>
+    val translations: List<TranslationWithSynonyms>
 )

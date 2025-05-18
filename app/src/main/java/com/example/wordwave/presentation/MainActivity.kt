@@ -10,43 +10,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 import com.example.wordwave.presentation.ui.theme.WordWaveTheme
-import com.example.wordwave.presentation.*
 import com.example.wordwave.presentation.game.FlashCardsScreen
+import com.example.wordwave.presentation.*
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
 
     private val FCviewModel: FlashCardsViewModel by viewModels()
-    private val DviewModel: ViewModel by viewModels()
+    private val DviewModel: DictionaryViewModel by viewModels()
     private val TviewModel: TranslationViewModel by viewModels()
     private val FakeViewModel: FakeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //startForegroundService(Intent(this, AddWordService::class.java))
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             WordWaveTheme {
                 AllApp(DviewModel, TviewModel, FCviewModel, FakeViewModel)
             }
         }
-
-
-
     }
 }
 
 @Composable
 fun AllApp(
-    DviewModel: ViewModel,
+    DviewModel: DictionaryViewModel,
     TviewModel: TranslationViewModel,
     FCviewModel: FlashCardsViewModel,
     FakeViewModel: FakeViewModel
@@ -56,17 +53,19 @@ fun AllApp(
     val color = colorResource(R.color.bar)
     val systemUiController = rememberSystemUiController()
 
+    FCviewModel.navController = navController
+    FCviewModel.dictionaryViewModel = DviewModel
+
     SideEffect {
         systemUiController.setStatusBarColor(color = color, darkIcons = true)
         systemUiController.setNavigationBarColor(color = Color.White, darkIcons = true)
     }
 
     NavHost(navController = navController, startDestination = "home_screen") {
-        composable("home_screen") { HomePageScreen(navController) }
+        composable("home_screen") { HomePageScreen(navController, FCviewModel) }
         composable("vocabulary_screen") { VocabularyScreen(navController, DviewModel) }
-        composable("add_word_screen") { AddWordScreen(navController, FakeViewModel, TviewModel) }
+        composable("add_word_screen") { AddWordScreen(navController, DviewModel, TviewModel) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }
         composable("flash_cards_screen") { FlashCardsScreen(navController, FCviewModel) }
-        composable("add_word_photo_screen") { AddWordPhotoScreen(navController) }
     }
 }

@@ -16,14 +16,11 @@ class DictionaryRepository(
 ) {
     suspend fun upsertUser(user: User) = userDao.upsertUser(user)
     suspend fun upsertLanguage(language: Language) = languageDao.upsertLanguage(language)
-    suspend fun upsertWord(word: Word) = dictionaryDao.upsertWord(word)
-    suspend fun upsertWordWithTranslations(word: Word, translations: List<String>) =
+    suspend fun upsertWordWithTranslations(word: Word, translations: Map<String, List<String>>) =
         dictionaryDao.upsertWordWithTranslations(word, translations)
 
     suspend fun getLanguages(userId: String): List<Language> = languageDao.getLanguagesByUser(userId)
-    suspend fun getWords(languageId: Int): List<Word> = dictionaryDao.getWordsByLanguage(languageId)
-    suspend fun getWordsWithTranslations(languageId: Int): List<WordWithTranslations> =
-        dictionaryDao.getWordsWithTranslationsByLanguage(languageId)
-
-    suspend fun updateProgress(wordId: Int, progress: Int) = dictionaryDao.updateProgress(wordId, progress)
+    suspend fun getWords(): List<WordWithTranslations> = dictionaryDao.getAllWordsWithTranslations()
+    /*suspend fun getWordsWithTranslations(language: String): List<WordWithTranslations> =
+        dictionaryDao.getWordWithTranslations(language)*/
 }

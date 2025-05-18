@@ -1,13 +1,8 @@
 package com.example.wordwave.data.local.db.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
-import androidx.room.Upsert
+import androidx.room.*
 import com.example.wordwave.data.local.db.WordWithTranslations
+import com.example.wordwave.data.local.db.entities.Synonym
 import com.example.wordwave.data.local.db.entities.Translation
 import com.example.wordwave.data.local.db.entities.Word
 
@@ -16,27 +11,43 @@ interface DictionaryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertWord(word: Word): Long
 
-    @Upsert()
-    suspend fun upsertTranslations(translations: List<Translation>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertTranslation(translation: Translation): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertSynonyms(synonyms: List<Synonym>): List<Long>
 
     @Transaction
-    suspend fun upsertWordWithTranslations(word: Word, translations: List<String>) {
-        val wordId = upsertWord(word).toInt()
-        val translationEntities = translations.map {
-            Translation(wordId = wordId, value = it)
+    suspend fun upsertWordWithTranslations(
+        word: Word,
+        translationsWithSynonyms: Map<String, List<String>>
+    ) {
+        val wordId = upsertWord(word)
+
+        translationsWithSynonyms.forEach { (translationText, synonymsList) ->
+            val translation = Translation(
+                wordId = wordId.toInt(),
+                translatedText = translationText,
+                partOfSpeech = "unknown",
+                language = word.language
+            )
+
+            val translationId = upsertTranslation(translation)
+
+            val synonymEntities = synonymsList.map { synonymText ->
+                Synonym(translationId = translationId.toInt(), text = synonymText)
+            }
+
+            upsertSynonyms(synonymEntities)
         }
-        upsertTranslations(translationEntities)
     }
 
     @Transaction
-    @Query("SELECT * FROM Word WHERE languageId = :languageId")
-    suspend fun getWordsWithTranslationsByLanguage(languageId: Int): List<WordWithTranslations>
+    @Query("SELECT * FROM Word")  // or SELECT * FROM WordEntityTable
+    fun getAllWordsWithTranslations(): List<WordWithTranslations>
 
-    @Query("SELECT * FROM Word WHERE languageId = :languageId")
-    suspend fun getWordsByLanguage(languageId: Int): List<Word>
-
-    @Query("UPDATE Word SET progress = :progress WHERE id = :wordId")
-    suspend fun updateProgress(wordId: Int, progress: Int)
+    @Query("SELECT * FROM Word WHERE language = :language")
+    suspend fun getWordsByLanguage(language: String): List<Word>
 
     @Delete
     suspend fun deleteWord(word: Word)

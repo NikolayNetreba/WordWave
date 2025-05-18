@@ -25,16 +25,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
-import com.example.wordwave.presentation.ViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import com.example.wordwave.presentation.ViewModel
 import kotlin.getValue
 
 @Composable
-fun AddWordScreen(navController: NavHostController, viewModel: FakeViewModel, TviewModel: TranslationViewModel) {
+fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewModel, TviewModel: TranslationViewModel) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -74,7 +74,7 @@ fun AddWordScreen(navController: NavHostController, viewModel: FakeViewModel, Tv
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, viewModel: FakeViewModel) {
+private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
 
     TopAppBar(
         title = {
@@ -106,7 +106,14 @@ private fun TopBar(navController: NavHostController, viewModel: FakeViewModel) {
             IconButton(
                 onClick =
                     {
-                        viewModel.addSampleData()
+                        val map = HashMap<String, List<String>>()
+                        map.put("гора", listOf("porn", "porno", "anal", "masturbate"))
+                        map.put("скала", listOf("porn", "porno", "anal", "masturbate"))
+
+                        viewModel.addWordWithTranslations(
+                            "mountain",
+                             map
+                        )
                     })
             {
                 Icon(
@@ -293,11 +300,11 @@ private fun ExampleUsageSection(viewModel: TranslationViewModel) {
     }
 }
 
-@Composable
+/*@Composable
 @Preview(showSystemUi = true)
 private fun PreviewAddWord() {
     val navController = rememberNavController()
     val viewModel: FakeViewModel = viewModel()
     val TviewModel: TranslationViewModel = viewModel()
     AddWordScreen(navController, viewModel, TviewModel)
-}
+}*/

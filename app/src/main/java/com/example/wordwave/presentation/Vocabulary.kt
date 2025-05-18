@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.wordwave.R
-import com.example.wordwave.presentation.ViewModel
 import com.example.wordwave.data.local.db.WordWithTranslations
+import com.example.wordwave.presentation.ViewModel
 import com.example.wordwave.data.local.db.entities.Word
 
 
@@ -60,7 +60,7 @@ fun VocabularyScreen(navController: NavHostController, viewModel: ViewModel) {
                     .background(Color.White)
             ) {
                 viewModel.updateLanguages("u0")
-                viewModel.updateWordsWithTranslations(1)
+                viewModel.updateWordsWithTranslations("en")
                 ShowWordList(viewModel.wordsWithTranslations)
             }
         }
@@ -149,8 +149,8 @@ fun ShowWordList(words: List<WordWithTranslations>) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         itemsIndexed(words) { index, (word, translations) ->
             NoteItem(
-                word = word.word,
-                translation = if (translations.size > 1) translations[1].value else translations[0].value,
+                word = word.text,
+                translation = translations[0].translation.translatedText,
                 isFirst = index == 0
             )
             HorizontalDivider(
