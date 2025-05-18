@@ -21,7 +21,7 @@ import androidx.navigation.NavHostController
 import com.example.wordwave.R
 
 @Composable
-fun HomePageScreen(navController: NavHostController, viewModel: FlashCardsViewModel) {
+fun HomePageScreen(navController: NavHostController, fcViewModel: FlashCardsViewModel, dViewModel: DictionaryViewModel) {
     Scaffold(
         topBar = { TopBar(navController, "Английский") },
         bottomBar = { NavigationBar(navController)},
@@ -37,7 +37,7 @@ fun HomePageScreen(navController: NavHostController, viewModel: FlashCardsViewMo
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
                 Diagrams()
                 HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
-                GamesTable(navController, viewModel)
+                GamesTable(navController, fcViewModel, dViewModel)
             }
         },
         containerColor = Color.White
@@ -115,7 +115,7 @@ fun Diagrams() {
 }
 
 @Composable
-fun GamesTable(navController: NavHostController, viewModel: FlashCardsViewModel) {
+fun GamesTable(navController: NavHostController, fcViewModel: FlashCardsViewModel, dViewModel: DictionaryViewModel) {
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -138,8 +138,11 @@ fun GamesTable(navController: NavHostController, viewModel: FlashCardsViewModel)
 
         games.forEach { (title, iconRes, route) ->
             GameButton(title = title, iconRes = iconRes) {
+                dViewModel.updateWords(1)
+                dViewModel.updateLanguages("u0")
+                dViewModel.updateWordsWithTranslations("en")
+                fcViewModel.initialize()
                 navController.navigate(route)
-                viewModel.initialize()
             }
             Spacer(modifier = Modifier.height(8.dp))
         }

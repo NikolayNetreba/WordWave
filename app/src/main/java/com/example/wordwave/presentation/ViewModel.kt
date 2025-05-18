@@ -1,7 +1,6 @@
 package com.example.wordwave.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wordwave.data.local.db.entities.Language
@@ -38,6 +37,21 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
 
     var languages by mutableStateOf<List<Language>>(emptyList())
         private set
+
+    fun initialize() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (repo.getUserById("u0") == null) {
+                repo.upsertUser(User("u0"))
+            }
+
+            if (repo.getLanguages("u0").isEmpty()) {
+                repo.upsertLanguage(Language(userId = "u0", name = "English", code = "en"))
+            }
+
+            updateLanguages("u0")
+            updateWordsWithTranslations("en")
+        }
+    }
 
     fun updateWords(languageId: Int) {
         /*viewModelScope.launch {
