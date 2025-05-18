@@ -70,6 +70,15 @@ internal fun TopBar(navController: NavHostController, title: String) {
                 )
             }
         },
+        actions = {
+            IconButton(onClick = {navController.navigate("add_word_photo_screen")}, modifier = Modifier.padding(horizontal = 4.dp)) {
+                Icon(
+                    painterResource(R.drawable.add_tr_from_photo),
+                    contentDescription = "add_word",
+                    tint = Color.White
+                )
+            }
+        },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = colorResource(R.color.bar),
             titleContentColor = Color.White

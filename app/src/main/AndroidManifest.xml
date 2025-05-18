@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Разрешения -->
     <uses-permission android:name="android.permission.INTERNET"/>
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
+<!--    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>-->
 
 
     <application
@@ -15,6 +18,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WordWave"
         tools:targetApi="31">
+
+<!--        &lt;!&ndash; Для ML Kit (OCR) &ndash;&gt;-->
+<!--        <meta-data-->
+<!--            android:name="com.google.mlkit.vision.DEPENDENCIES"-->
+<!--            android:value="ocr"/>-->
+
+<!--        &lt;!&ndash; Foreground Service для захвата экрана &ndash;&gt;-->
+<!--        <service-->
+<!--            android:name=".presentation.viewMessage.AddWordService"-->
+<!--            android:exported="false"-->
+<!--            />-->
+
+<!--        &lt;!&ndash; Прозрачная Activity для выбора области экрана &ndash;&gt;-->
+<!--        <activity-->
+<!--            android:name=".presentation.viewMessage.SelectionActivity"-->
+<!--            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"-->
+<!--            android:exported="false" />-->
+
+        <!-- Главная Activity -->
         <activity
             android:name=".presentation.MainActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
@@ -23,10 +45,10 @@
             android:theme="@style/Theme.WordWave">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

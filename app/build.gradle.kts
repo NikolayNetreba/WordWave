@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.benchmark.macro)
+    implementation(libs.filament.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -99,7 +100,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
-    implementation (libs.androidx.room.runtime)
+    implementation(libs.text.recognition)
+    implementation(libs.androidx.datastore.preferences)
 
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
     // See KSP Quickstart to add KSP to your build

@@ -1,6 +1,7 @@
 package com.example.wordwave.presentation
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -30,12 +32,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        //startForegroundService(Intent(this, AddWordService::class.java))
         setContent {
             WordWaveTheme {
                 AllApp(DviewModel, TviewModel, FCviewModel, FakeViewModel)
             }
         }
+
+
+
     }
 }
 
@@ -62,5 +67,6 @@ fun AllApp(
         composable("add_word_screen") { AddWordScreen(navController, FakeViewModel, TviewModel) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }
         composable("flash_cards_screen") { FlashCardsScreen(navController, FCviewModel) }
+        composable("add_word_photo_screen") { AddWordPhotoScreen(navController) }
     }
 }
