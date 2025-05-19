@@ -21,9 +21,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.wordwave.R
 import com.example.wordwave.data.local.db.WordWithTranslations
+import com.example.wordwave.presentation.DictionaryViewModel
+import com.example.wordwave.data.local.db.entities.Word
 
 
 @Composable
@@ -42,7 +45,7 @@ fun VocabularyScreen(navController: NavHostController, viewModel: DictionaryView
         topBar = {
             Column {
                 VocabularyTopBar()
-                CategoryTabs(categories)
+                CategoryTabs(categories, navController)
             }
         },
         bottomBar = {
@@ -59,7 +62,7 @@ fun VocabularyScreen(navController: NavHostController, viewModel: DictionaryView
             ) {
                 viewModel.updateLanguages("u0")
                 viewModel.updateWordsWithTranslations("en")
-                ShowWordList(viewModel.wordsWithTranslations)
+                ShowWordList(viewModel.wordsWithTranslations, navController, viewModel)
             }
         }
     )
@@ -67,7 +70,7 @@ fun VocabularyScreen(navController: NavHostController, viewModel: DictionaryView
 }
 
 @Composable
-fun CategoryTabs(categories: List<String>) {
+fun CategoryTabs(categories: List<String>, navController: NavHostController) {
     val selectedCategoryIndex = remember { mutableStateOf(0) }
 
     LazyRow(
@@ -82,14 +85,15 @@ fun CategoryTabs(categories: List<String>) {
             CategoryTab(
                 category = category,
                 isSelected = index == selectedCategoryIndex.value,
-                onClick = { selectedCategoryIndex.value = index }
+                onClick = { selectedCategoryIndex.value = index },
+                navController
             )
         }
     }
 }
 
 @Composable
-fun CategoryTab(category: String, isSelected: Boolean, onClick: () -> Unit) {
+fun CategoryTab(category: String, isSelected: Boolean, onClick: () -> Unit, navController: NavHostController) {
     Text(
         text = category,
         fontSize = 16.sp,
@@ -97,7 +101,7 @@ fun CategoryTab(category: String, isSelected: Boolean, onClick: () -> Unit) {
         color = if (isSelected) Color.White else colorResource(R.color.text_bar),
         modifier = Modifier
             .padding(horizontal = 10.dp, vertical = 3.dp)
-            .clickable { onClick() }
+            .clickable { }
     )
 }
 
@@ -143,13 +147,16 @@ private fun VocabularyTopBar() {
 }
 
 @Composable
-fun ShowWordList(words: List<WordWithTranslations>) {
+fun ShowWordList(words: List<WordWithTranslations>, navController: NavHostController, viewModel: DictionaryViewModel) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         itemsIndexed(words) { index, (word, translations) ->
             NoteItem(
                 word = word.text,
                 translation = translations[0].translation.translatedText,
-                isFirst = index == 0
+                isFirst = index == 0,
+                navController,
+                words[index],
+                viewModel
             )
             HorizontalDivider(
                 thickness = 1.dp,
@@ -174,7 +181,14 @@ fun ShowWordList(words: List<WordWithTranslations>) {
 }
 
 @Composable
-fun NoteItem(word: String, translation: String, isFirst: Boolean) {
+fun NoteItem(
+    word: String,
+    translation: String,
+    isFirst: Boolean,
+    navController: NavHostController,
+    wwt: WordWithTranslations,
+    viewModel: DictionaryViewModel
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -185,7 +199,11 @@ fun NoteItem(word: String, translation: String, isFirst: Boolean) {
                     topEnd = 10.dp
                 ) else RoundedCornerShape(0.dp)
             )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable {
+                navController.navigate("show_card_screen")
+                viewModel.cr = wwt
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -205,11 +223,3 @@ fun VocabularyPreview() {
     val navController = rememberNavController()
     VocabularyScreen(navController)
 }*/
-
-
-
-
-
-
-
-

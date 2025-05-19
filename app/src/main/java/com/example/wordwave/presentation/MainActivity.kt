@@ -64,5 +64,6 @@ fun AllApp(
         composable("add_word_screen") { AddWordScreen(navController, DviewModel, TviewModel) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }
         composable("flash_cards_screen") { FlashCardsScreen(navController, FCviewModel) }
+        composable ("show_card_screen") { ShowCardScreen(navController, DviewModel) }
     }
 }
