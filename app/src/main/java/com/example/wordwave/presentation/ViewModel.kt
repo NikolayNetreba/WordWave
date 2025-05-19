@@ -170,6 +170,14 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
             updateWords(currentLangId)
         }*/
     }
+
+    fun deleteWord(word: Word) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.deleteWord(word)
+            // обновляем список после удаления
+            updateWordsWithTranslations("en")
+        }
+    }
 }
 
 

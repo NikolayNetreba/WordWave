@@ -6,8 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -18,10 +16,12 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.wordwave.presentation.FlashCardsViewModel
+import com.example.wordwave.R
 
 @Composable
 fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsViewModel) {
@@ -40,7 +40,7 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -58,7 +58,7 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
             Surface(
                 shape = RoundedCornerShape(24.dp),
                 tonalElevation = 6.dp,
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = colorResource(R.color.grey_graph),
                 shadowElevation = 8.dp,
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -79,7 +79,7 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                             Box(
                                 Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                                    .padding(horizontal = 12.dp, vertical = 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -94,7 +94,7 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 thickness = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                color = colorResource(R.color.line)
                             )
 
                             // 3) Список переводов
@@ -121,15 +121,13 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 thickness = 1.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                color = colorResource(R.color.line)
                             )
 
                             // 5) Кнопки прижаты к низу
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 24.dp)
-                                    .padding(top = 12.dp, bottom = 24.dp),
+                                    .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 TextButton(
@@ -137,17 +135,15 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                                     modifier = Modifier.weight(1f),
                                     colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF4CAF50))
                                 ) {
-                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("Помню", style = MaterialTheme.typography.titleMedium)
+                                    Text("Помню", style = MaterialTheme.typography.titleMedium, maxLines = 1)
                                 }
-                                Spacer(Modifier.width(16.dp))
+                                Spacer(Modifier.width(8.dp))
                                 TextButton(
                                     onClick = { viewModel.onDontRememberClicked() },
                                     modifier = Modifier.weight(1f),
-                                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Black)
                                 ) {
-                                    Text("Не помню", style = MaterialTheme.typography.titleMedium)
+                                    Text("Не помню", style = MaterialTheme.typography.titleMedium, maxLines = 1)
                                 }
                             }
                         }

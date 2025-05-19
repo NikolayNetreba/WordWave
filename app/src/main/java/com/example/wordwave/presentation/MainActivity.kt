@@ -13,6 +13,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
+import com.example.wordwave.presentation.game.BuildWord
+import com.example.wordwave.presentation.game.ChooseWord
+import com.example.wordwave.presentation.game.FindPairs
 import com.example.wordwave.presentation.ui.theme.WordWaveTheme
 import com.example.wordwave.presentation.game.FlashCardsScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -63,7 +66,11 @@ fun AllApp(
         composable("vocabulary_screen") { VocabularyScreen(navController, DviewModel) }
         composable("add_word_screen") { AddWordScreen(navController, DviewModel, TviewModel) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }
-        composable("flash_cards_screen") { FlashCardsScreen(navController, FCviewModel) }
         composable ("show_card_screen") { ShowCardScreen(navController, DviewModel) }
+        //Games
+        composable("flash_cards_screen") { FlashCardsScreen(navController, FCviewModel) }
+        composable("choose_word_screen") { ChooseWord() }
+        composable("build_word_screen") { BuildWord() }
+        composable("find_pairs_screen") { FindPairs() }
     }
 }

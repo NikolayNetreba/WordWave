@@ -1,40 +1,37 @@
 package com.example.wordwave.presentation
 
 import android.util.Log
-import android.app.Application
-import androidx.activity.viewModels
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import java.util.logging.Logger
-import com.example.wordwave.presentation.DictionaryViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlin.getValue
 
 @Composable
 fun AddWordScreen(
@@ -45,7 +42,7 @@ fun AddWordScreen(
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
-            TopBar(navController, dViewModel)
+            TopBar(navController, dViewModel, TviewModel)
         },
         bottomBar = {
             NavigationBar(navController)
@@ -81,8 +78,13 @@ fun AddWordScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
+private fun TopBar(
+    navController: NavHostController,
+    DviewModel: DictionaryViewModel,
+    TviewModel: TranslationViewModel
+) {
 
+    val context = LocalContext.current
     TopAppBar(
         title = {
             Box(
@@ -113,7 +115,10 @@ private fun TopBar(navController: NavHostController, viewModel: DictionaryViewMo
             IconButton(
                 onClick =
                     {
-                        viewModel.saveDefinitions()
+                        DviewModel.saveDefinitions()
+                        navController.popBackStack()
+                        Toast.makeText(context, "Слово сохранено", Toast.LENGTH_SHORT).show()
+                        TviewModel.clearInputText()
                     })
             {
                 Icon(
@@ -157,6 +162,7 @@ private fun WordInputSection(tViewModel: TranslationViewModel, dViewModel: Dicti
     val definitions by tViewModel.definitions.collectAsState()
     val errorMessage by tViewModel.errorMessage.collectAsState()
     dViewModel.currentDefinitions = definitions
+    var addTranslate by rememberSaveable { mutableStateOf("") }
 
 
     LaunchedEffect(inputText) {
@@ -216,11 +222,56 @@ private fun WordInputSection(tViewModel: TranslationViewModel, dViewModel: Dicti
     )
     if (inputText.isNotEmpty()) {
         Spacer(modifier = Modifier.height(16.dp))
-        val addTranslate = ""
+
+        Column(
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(colorResource(R.color.grey_graph))
+                .padding(horizontal = 12.dp)
+        ) {
+            dViewModel.currentDefinitions = definitions
+            dViewModel.currentWord = inputText
+            Log.println(Log.ASSERT, null, inputText + " " + (definitions.isNotEmpty()))
+            definitions.forEach { def ->
+                val title = buildString {
+                    append(def.text)
+                    def.pos?.let { append(" [$it]") }
+                }
+                SectionTitle(title)
+
+                def.tr.forEachIndexed { index, tr ->
+                    Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
+                        val allSynonyms = buildList {
+                            add(tr.text)
+                            tr.syn?.forEach { add(it.text) }
+                        }
+
+                        Text(
+                            "${index + 1}. " + allSynonyms.joinToString(", "),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        )
+
+                        tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
+                            Text(
+                                meanings.joinToString(", ") { it.text },
+                                color = Color.Gray,
+                                fontSize = 12.sp,
+                                softWrap = true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
         Column {
             TextField(
-                value = "",
-                onValueChange = {},
+                value = addTranslate,
+                onValueChange = { addTranslate = it },
                 placeholder = { Text("Добавить свой перевод") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -232,66 +283,28 @@ private fun WordInputSection(tViewModel: TranslationViewModel, dViewModel: Dicti
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
+
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (addTranslate.isNotBlank()) {
+                            addTranslate = ""
+                        }
+                    }
+                ),
                 trailingIcon = {
                     if (addTranslate.isNotEmpty()) {
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = { addTranslate = "" }) {
                             Icon(
                                 painterResource(R.drawable.close_icon),
-                                tint = Color.Black,
                                 contentDescription = "Clear"
                             )
                         }
                     }
                 }
             )
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-
-            Column(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White)
-                    .padding(horizontal = 12.dp)
-                    .padding(top = 12.dp)
-            ) {
-                dViewModel.currentDefinitions = definitions
-                dViewModel.currentWord = inputText
-                Log.println(Log.ASSERT, null, inputText + " " + (definitions.isNotEmpty()))
-                definitions.forEach { def ->
-                    val title = buildString {
-                        append(def.text)
-                        def.pos?.let { append(" [$it]") }
-                    }
-                    SectionTitle(title)
-
-                    def.tr.forEachIndexed { index, tr ->
-                        Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
-                            val allSynonyms = buildList {
-                                add(tr.text)
-                                tr.syn?.forEach { add(it.text) }
-                            }
-
-                            Text(
-                                "${index + 1}. " + allSynonyms.joinToString(", "),
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 16.sp
-                            )
-
-                            tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
-                                Text(
-                                    meanings.joinToString(", ") { it.text },
-                                    color = Color.Gray,
-                                    fontSize = 12.sp,
-                                    softWrap = true
-                                )
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -299,39 +312,70 @@ private fun WordInputSection(tViewModel: TranslationViewModel, dViewModel: Dicti
 @Composable
 private fun ExampleUsageSection(viewModel: TranslationViewModel) {
     val inputText by viewModel.inputText.collectAsState()
+    val examples by viewModel.examples.collectAsState()
     if (inputText.isNotEmpty()) {
-        Column {
-            TextField(
-                value = "",
-                onValueChange = {},
-                placeholder = { Text("Добавить свой пример") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedContainerColor = colorResource(R.color.grey_graph),
-                    unfocusedContainerColor = colorResource(R.color.grey_graph),
-                    cursorColor = Color.Black,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                trailingIcon = {
-                    IconButton(onClick = {}) {
+        var addExample by rememberSaveable { mutableStateOf("") }
+
+
+        // Поле для добавления примера
+        TextField(
+            value = addExample,
+            onValueChange = { addExample = it },
+            placeholder = { Text("Добавить свой пример") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+                focusedContainerColor = colorResource(R.color.grey_graph),
+                unfocusedContainerColor = colorResource(R.color.grey_graph),
+                cursorColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (addExample.isNotBlank()) {
+                        // Добавь логику сохранения примера в ViewModel
+                        addExample = ""
+                    }
+                }
+            ),
+            trailingIcon = {
+                if (addExample.isNotEmpty()) {
+                    IconButton(onClick = { addExample = "" }) {
                         Icon(
                             painterResource(R.drawable.close_icon),
-                            tint = Color.Black,
                             contentDescription = "Clear"
                         )
                     }
                 }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Примеры использования",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (examples.isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(colorResource(R.color.grey_graph))
+                    .padding(horizontal = 12.dp)
+            ) {
+                SectionTitle("Примеры")
+                examples.forEach { example ->
+                    Text(
+                        text = "• $example",
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                    )
+                }
+            }
+
         }
     }
 }
@@ -346,12 +390,3 @@ private fun SectionTitle(title: String) {
         modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
     )
 }
-
-/*@Composable
-@Preview(showSystemUi = true)
-private fun PreviewAddWord() {
-    val navController = rememberNavController()
-    val viewModel: FakeViewModel = viewModel()
-    val TviewModel: TranslationViewModel = viewModel()
-    AddWordScreen(navController, viewModel, TviewModel)
-}*/

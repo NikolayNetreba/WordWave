@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.google.accompanist.systemuicontroller)
+    implementation (libs.androidx.material)
 
     // Room
     implementation(libs.androidx.room.runtime)
