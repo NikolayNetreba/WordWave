@@ -13,7 +13,7 @@ import com.example.wordwave.data.local.db.entities.Translation
 import com.example.wordwave.data.local.db.entities.User
 import com.example.wordwave.data.local.db.entities.Word
 
-@Database(entities = [User::class, Language::class, Word::class, Translation::class, Synonym::class], version = 5)
+@Database(entities = [User::class, Language::class, Word::class, Translation::class, Synonym::class], version = 8)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun languageDao(): LanguageDao

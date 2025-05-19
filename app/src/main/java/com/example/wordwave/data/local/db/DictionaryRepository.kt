@@ -18,6 +18,9 @@ class DictionaryRepository(
     suspend fun upsertWordWithTranslations(word: Word, translations: Map<String, List<String>>) =
         dictionaryDao.upsertWordWithTranslations(word, translations)
 
+    suspend fun getUserById(id: String) = userDao.getUserById(id)
+    suspend fun getLanguagesByUserId(id: String) = languageDao.getLanguagesByUser(id)
+
     suspend fun getLanguages(userId: String): List<Language> = languageDao.getLanguagesByUser(userId)
     suspend fun getWords(): List<WordWithTranslations> = dictionaryDao.getAllWordsWithTranslations()
     /*suspend fun getWordsWithTranslations(language: String): List<WordWithTranslations> =

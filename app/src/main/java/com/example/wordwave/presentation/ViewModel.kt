@@ -1,7 +1,6 @@
 package com.example.wordwave.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wordwave.data.local.db.entities.Language
@@ -38,6 +37,62 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
 
     var languages by mutableStateOf<List<Language>>(emptyList())
         private set
+
+    var currentDefinitions: List<Definition>? = null
+    var currentWord: String? = null
+    var cr: WordWithTranslations? = null
+
+    fun saveDefinitions() {
+        if (currentDefinitions == null || currentWord == null || currentDefinitions!!.isEmpty()) {
+            return
+        }
+
+        val map = HashMap<String, List<String>>()
+        for (df in currentDefinitions) {
+            for (tr in df.tr) {
+                if (tr.syn == null) {
+                    map.put(tr.text, emptyList())
+                    continue
+                }
+
+                var synonyms = emptyList<String>()
+                for (sn in tr.syn) {
+                    synonyms += sn.text;
+                }
+
+                map.put(tr.text, synonyms)
+            }
+        }
+
+        addWordWithTranslations(currentWord!!, map)
+        updateWordsWithTranslations("хуй")
+    }
+
+    fun initialize() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (repo.getUserById("u0") == null) {
+                repo.upsertUser(User("u0"))
+            }
+
+            if (repo.getLanguages("u0").isEmpty()) {
+                repo.upsertLanguage(Language(userId = "u0", name = "English", code = "en"))
+            }
+
+            updateLanguages("u0")
+            updateWordsWithTranslations("en")
+        }
+    }
+
+    fun getWordWithTranslation(word: String): WordWithTranslations? {
+        updateWordsWithTranslations("en")
+        for (w in wordsWithTranslations) {
+            if (w.word.text == word) {
+                return w
+            }
+        }
+
+        return null
+    }
 
     fun updateWords(languageId: Int) {
         /*viewModelScope.launch {

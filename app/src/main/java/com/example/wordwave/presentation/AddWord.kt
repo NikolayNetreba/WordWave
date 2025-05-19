@@ -1,5 +1,6 @@
 package com.example.wordwave.presentation
 
+import android.util.Log
 import android.app.Application
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -26,24 +27,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import java.util.logging.Logger
 import com.example.wordwave.presentation.DictionaryViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlin.getValue
 
 @Composable
 fun AddWordScreen(
     navController: NavHostController,
-    viewModel: DictionaryViewModel,
+    dViewModel: DictionaryViewModel,
     TviewModel: TranslationViewModel
 ) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
-            TopBar(navController, viewModel)
+            TopBar(navController, dViewModel)
         },
         bottomBar = {
             NavigationBar(navController)
@@ -67,7 +69,7 @@ fun AddWordScreen(
                     item {
                         ImageUploadSection()
                         Spacer(modifier = Modifier.height(16.dp))
-                        WordInputSection(TviewModel)
+                        WordInputSection(TviewModel, dViewModel)
                         Spacer(modifier = Modifier.height(16.dp))
                         ExampleUsageSection(TviewModel)
                     }
@@ -111,7 +113,7 @@ private fun TopBar(navController: NavHostController, viewModel: DictionaryViewMo
             IconButton(
                 onClick =
                     {
-
+                        viewModel.saveDefinitions()
                     })
             {
                 Icon(
@@ -148,13 +150,14 @@ private fun ImageUploadSection() {
     }
 }
 
-
 @OptIn(FlowPreview::class)
 @Composable
-private fun WordInputSection(viewModel: TranslationViewModel) {
-    val inputText by viewModel.inputText.collectAsState()
-    val definitions by viewModel.definitions.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
+private fun WordInputSection(tViewModel: TranslationViewModel, dViewModel: DictionaryViewModel) {
+    val inputText by tViewModel.inputText.collectAsState()
+    val definitions by tViewModel.definitions.collectAsState()
+    val errorMessage by tViewModel.errorMessage.collectAsState()
+    dViewModel.currentDefinitions = definitions
+
 
     LaunchedEffect(inputText) {
         snapshotFlow { inputText }
@@ -162,7 +165,7 @@ private fun WordInputSection(viewModel: TranslationViewModel) {
             .filter { it.isNotBlank() }
             .distinctUntilChanged()
             .collectLatest {
-                viewModel.translateWord()
+                tViewModel.translateWord()
             }
     }
 
@@ -176,7 +179,7 @@ private fun WordInputSection(viewModel: TranslationViewModel) {
 
     TextField(
         value = inputText,
-        onValueChange = viewModel::updateInputText,
+        onValueChange = tViewModel::updateInputText,
         placeholder = { Text("Введите текст") },
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
@@ -200,7 +203,7 @@ private fun WordInputSection(viewModel: TranslationViewModel) {
                             contentDescription = "Play Sound"
                         )
                     }
-                    IconButton(onClick = viewModel::clearInputText) {
+                    IconButton(onClick = tViewModel::clearInputText) {
                         Icon(
                             painter = painterResource(R.drawable.close_icon),
                             contentDescription = "Clear text",
@@ -213,50 +216,6 @@ private fun WordInputSection(viewModel: TranslationViewModel) {
     )
     if (inputText.isNotEmpty()) {
         Spacer(modifier = Modifier.height(16.dp))
-
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(colorResource(R.color.grey_graph))
-                .padding(horizontal = 12.dp)
-        ) {
-            definitions.forEach { def ->
-                val title = buildString {
-                    append(def.text)
-                    def.pos?.let { append(" [$it]") }
-                }
-                SectionTitle(title)
-
-                def.tr.forEachIndexed { index, tr ->
-                    Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
-                        val allSynonyms = buildList {
-                            add(tr.text)
-                            tr.syn?.forEach { add(it.text) }
-                        }
-
-                        Text(
-                            "${index + 1}. " + allSynonyms.joinToString(", "),
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp
-                        )
-
-                        tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
-                            Text(
-                                meanings.joinToString(", ") { it.text },
-                                color = Color.Gray,
-                                fontSize = 12.sp,
-                                softWrap = true
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         val addTranslate = ""
         Column {
             TextField(
@@ -285,6 +244,54 @@ private fun WordInputSection(viewModel: TranslationViewModel) {
                     }
                 }
             )
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White)
+                    .padding(horizontal = 12.dp)
+                    .padding(top = 12.dp)
+            ) {
+                dViewModel.currentDefinitions = definitions
+                dViewModel.currentWord = inputText
+                Log.println(Log.ASSERT, null, inputText + " " + (definitions.isNotEmpty()))
+                definitions.forEach { def ->
+                    val title = buildString {
+                        append(def.text)
+                        def.pos?.let { append(" [$it]") }
+                    }
+                    SectionTitle(title)
+
+                    def.tr.forEachIndexed { index, tr ->
+                        Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
+                            val allSynonyms = buildList {
+                                add(tr.text)
+                                tr.syn?.forEach { add(it.text) }
+                            }
+
+                            Text(
+                                "${index + 1}. " + allSynonyms.joinToString(", "),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp
+                            )
+
+                            tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
+                                Text(
+                                    meanings.joinToString(", ") { it.text },
+                                    color = Color.Gray,
+                                    fontSize = 12.sp,
+                                    softWrap = true
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

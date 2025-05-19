@@ -51,13 +51,15 @@ fun AllApp(
     FCviewModel.navController = navController
     FCviewModel.dictionaryViewModel = DviewModel
 
+    DviewModel.initialize()
+
     SideEffect {
         systemUiController.setStatusBarColor(color = color, darkIcons = true)
         systemUiController.setNavigationBarColor(color = Color.White, darkIcons = true)
     }
 
     NavHost(navController = navController, startDestination = "home_screen") {
-        composable("home_screen") { HomePageScreen(navController, FCviewModel) }
+        composable("home_screen") { HomePageScreen(navController, FCviewModel, DviewModel) }
         composable("vocabulary_screen") { VocabularyScreen(navController, DviewModel) }
         composable("add_word_screen") { AddWordScreen(navController, DviewModel, TviewModel) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }

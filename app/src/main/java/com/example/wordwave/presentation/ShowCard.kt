@@ -41,7 +41,7 @@ fun ShowCardScreen(navController: NavHostController, viewModel: DictionaryViewMo
         topBar = { TopBar(navController, viewModel) },
         modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()),
         containerColor = Color.White,
-        bottomBar = {NavigationBar(navController)},
+        bottomBar = { NavigationBar(navController) },
         content = { padding ->
             Box(
                 modifier = Modifier
@@ -87,21 +87,37 @@ private fun ImageUploadSection(viewModel: DictionaryViewModel) {
         }
     }
 }
-private fun ShowTranslate(viewModel: DictionaryViewModel){
 
+@Composable
+private fun ShowTranslate(viewModel: DictionaryViewModel) {
+    var wwt = viewModel.cr!!
+
+    wwt.translations.forEachIndexed { index, tr ->
+        Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
+            val allSynonyms = buildList {
+                add(tr.translation.translatedText)
+                tr.synonyms.forEach { add(it.text) }
+            }
+
+            Text(
+                "${index + 1}. " + allSynonyms.joinToString(", "),
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(navController: NavHostController, viewModel: DictionaryViewModel) {
-
     TopAppBar(
         title = {
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.add_word_title),
+                    text = viewModel.cr?.word?.text ?: "",
                     fontSize = dimensionResource(R.dimen.title_size).value.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White,

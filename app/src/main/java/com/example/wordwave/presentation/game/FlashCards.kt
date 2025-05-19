@@ -74,11 +74,7 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                             style = MaterialTheme.typography.headlineMedium
                         )
                     } else {
-                        Column(
-                            Modifier
-                                .fillMaxSize()
-                                .scale(-1f, 1f)
-                        ) {
+                        Column(Modifier.fillMaxSize().scale(-1f, 1f)) {
                             // 1) Заголовок
                             Box(
                                 Modifier
@@ -101,7 +97,7 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                             )
 
-// 3) Список переводов
+                            // 3) Список переводов
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
@@ -139,17 +135,9 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                                 TextButton(
                                     onClick = { viewModel.onRememberClicked() },
                                     modifier = Modifier.weight(1f),
-                                    colors = ButtonDefaults.textButtonColors(
-                                        contentColor = Color(
-                                            0xFF4CAF50
-                                        )
-                                    )
+                                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF4CAF50))
                                 ) {
-                                    Icon(
-                                        Icons.Default.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
-                                    )
+                                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(20.dp))
                                     Spacer(Modifier.width(8.dp))
                                     Text("Помню", style = MaterialTheme.typography.titleMedium)
                                 }
