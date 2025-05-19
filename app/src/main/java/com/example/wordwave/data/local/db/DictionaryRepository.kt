@@ -3,7 +3,6 @@ package com.example.wordwave.data.local.db
 import com.example.wordwave.data.local.db.dao.DictionaryDao
 import com.example.wordwave.data.local.db.dao.LanguageDao
 import com.example.wordwave.data.local.db.dao.UserDao
-import com.example.wordwave.data.local.db.dao.WordDao
 import com.example.wordwave.data.local.db.entities.Language
 import com.example.wordwave.data.local.db.entities.Translation
 import com.example.wordwave.data.local.db.entities.User

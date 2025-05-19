@@ -1,7 +1,5 @@
 package com.example.wordwave.presentation
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,15 +9,12 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.core.view.WindowCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wordwave.R
 import com.example.wordwave.presentation.ui.theme.WordWaveTheme
 import com.example.wordwave.presentation.game.FlashCardsScreen
-import com.example.wordwave.presentation.*
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlin.getValue
 
@@ -67,5 +62,6 @@ fun AllApp(
         composable("add_word_screen") { AddWordScreen(navController, DviewModel, TviewModel) }
         composable("translate_screen") { TranslateScreen(navController, TviewModel) }
         composable("flash_cards_screen") { FlashCardsScreen(navController, FCviewModel) }
+        composable ("show_card_screen") { ShowCardScreen(navController, DviewModel) }
     }
 }

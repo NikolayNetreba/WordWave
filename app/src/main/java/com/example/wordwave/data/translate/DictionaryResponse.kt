@@ -12,10 +12,8 @@ data class Definition(
 
 data class DictionaryTranslation(
     val text: String,
-    val pos: String?,
     val syn: List<Synonym>?,
     val mean: List<Meaning>?,
-    val ex: List<Example>?
 )
 
 data class Synonym(
@@ -27,11 +25,3 @@ data class Meaning(
     val text: String
 )
 
-data class Example(
-    val text: String,
-    val tr: List<ExampleTranslation>
-)
-
-data class ExampleTranslation(
-    val text: String
-)

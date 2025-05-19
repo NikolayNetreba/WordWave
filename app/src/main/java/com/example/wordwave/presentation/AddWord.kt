@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -30,11 +31,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import com.example.wordwave.presentation.ViewModel
+import com.example.wordwave.presentation.DictionaryViewModel
 import kotlin.getValue
 
 @Composable
-fun AddWordScreen(navController: NavHostController, viewModel: DictionaryViewModel, TviewModel: TranslationViewModel) {
+fun AddWordScreen(
+    navController: NavHostController,
+    viewModel: DictionaryViewModel,
+    TviewModel: TranslationViewModel
+) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -106,14 +111,7 @@ private fun TopBar(navController: NavHostController, viewModel: DictionaryViewMo
             IconButton(
                 onClick =
                     {
-                        val map = HashMap<String, List<String>>()
-                        map.put("гора", listOf("porn", "porno", "anal", "masturbate"))
-                        map.put("скала", listOf("porn", "porno", "anal", "masturbate"))
 
-                        viewModel.addWordWithTranslations(
-                            "mountain",
-                             map
-                        )
                     })
             {
                 Icon(
@@ -150,10 +148,12 @@ private fun ImageUploadSection() {
     }
 }
 
+
 @OptIn(FlowPreview::class)
 @Composable
-private fun WordInputSection(viewModel: TranslationViewModel,) {
+private fun WordInputSection(viewModel: TranslationViewModel) {
     val inputText by viewModel.inputText.collectAsState()
+    val definitions by viewModel.definitions.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(inputText) {
@@ -191,7 +191,7 @@ private fun WordInputSection(viewModel: TranslationViewModel,) {
         textStyle = LocalTextStyle.current.copy(fontSize = fontSize),
         singleLine = true,
         trailingIcon = {
-            if(inputText.isNotEmpty()) {
+            if (inputText.isNotEmpty()) {
                 Row {
                     IconButton(onClick = {}) {
                         Icon(
@@ -211,7 +211,50 @@ private fun WordInputSection(viewModel: TranslationViewModel,) {
             }
         },
     )
-    if(inputText.isNotEmpty()) {
+    if (inputText.isNotEmpty()) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(
+            modifier = Modifier
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(colorResource(R.color.grey_graph))
+                .padding(horizontal = 12.dp)
+        ) {
+            definitions.forEach { def ->
+                val title = buildString {
+                    append(def.text)
+                    def.pos?.let { append(" [$it]") }
+                }
+                SectionTitle(title)
+
+                def.tr.forEachIndexed { index, tr ->
+                    Column(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)) {
+                        val allSynonyms = buildList {
+                            add(tr.text)
+                            tr.syn?.forEach { add(it.text) }
+                        }
+
+                        Text(
+                            "${index + 1}. " + allSynonyms.joinToString(", "),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        )
+
+                        tr.mean?.takeIf { it.isNotEmpty() }?.let { meanings ->
+                            Text(
+                                meanings.joinToString(", ") { it.text },
+                                color = Color.Gray,
+                                fontSize = 12.sp,
+                                softWrap = true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         val addTranslate = ""
@@ -242,20 +285,6 @@ private fun WordInputSection(viewModel: TranslationViewModel,) {
                     }
                 }
             )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colorResource(R.color.grey_graph), RoundedCornerShape(8.dp))
-                    .padding(8.dp)
-            ) {
-                Text(
-                    text = "Слово [транскрипция] сущ\n1 перевод",
-                    fontSize = 14.sp,
-                    color = Color.Black
-                )
-            }
         }
     }
 }
@@ -263,7 +292,7 @@ private fun WordInputSection(viewModel: TranslationViewModel,) {
 @Composable
 private fun ExampleUsageSection(viewModel: TranslationViewModel) {
     val inputText by viewModel.inputText.collectAsState()
-    if(inputText.isNotEmpty()) {
+    if (inputText.isNotEmpty()) {
         Column {
             TextField(
                 value = "",
@@ -298,6 +327,17 @@ private fun ExampleUsageSection(viewModel: TranslationViewModel) {
             )
         }
     }
+}
+
+@Composable
+private fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        color = Color.Black,
+        modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
+    )
 }
 
 /*@Composable

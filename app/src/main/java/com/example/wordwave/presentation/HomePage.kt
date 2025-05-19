@@ -3,6 +3,7 @@ package com.example.wordwave.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -27,17 +28,27 @@ fun HomePageScreen(navController: NavHostController, viewModel: FlashCardsViewMo
         bottomBar = { NavigationBar(navController)},
         modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues()),
         content = { padding ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .background(Color.White)
             ) {
-                AllWordButton(navController)
-                HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
-                Diagrams()
-                HorizontalDivider(color = colorResource(R.color.line), thickness = 1.dp, modifier = Modifier.padding(horizontal = 32.dp))
-                GamesTable(navController, viewModel)
+                item {
+                    AllWordButton(navController)
+                    HorizontalDivider(
+                        color = colorResource(R.color.line),
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                    Diagrams()
+                    HorizontalDivider(
+                        color = colorResource(R.color.line),
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                    GamesTable(navController, viewModel)
+                }
             }
         },
         containerColor = Color.White
