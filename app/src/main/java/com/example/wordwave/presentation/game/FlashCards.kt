@@ -5,7 +5,9 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -98,11 +100,14 @@ fun FlashCardsScreen(navController: NavHostController, viewModel: FlashCardsView
                             )
 
                             // 3) Список переводов
+                            val scrollState = rememberScrollState()
+
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxWidth()
-                                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                                    .padding(horizontal = 24.dp, vertical = 16.dp)
+                                    .verticalScroll(scrollState),  // <-- Добавляем скролл
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {

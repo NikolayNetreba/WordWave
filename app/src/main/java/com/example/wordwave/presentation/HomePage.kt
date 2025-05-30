@@ -1,5 +1,6 @@
 package com.example.wordwave.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -127,6 +129,7 @@ fun Diagrams() {
 
 @Composable
 fun GamesTable(navController: NavHostController, fcViewModel: FlashCardsViewModel, dViewModel: DictionaryViewModel) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -152,6 +155,12 @@ fun GamesTable(navController: NavHostController, fcViewModel: FlashCardsViewMode
                 dViewModel.updateWords(1)
                 dViewModel.updateLanguages("u0")
                 dViewModel.updateWordsWithTranslations("en")
+
+                if (dViewModel.words.isEmpty()) {
+                    Toast.makeText(context, "Недостаточное количество слов!", Toast.LENGTH_SHORT).show()
+                    return@GameButton
+                }
+
                 fcViewModel.initialize()
                 navController.navigate(route)
             }

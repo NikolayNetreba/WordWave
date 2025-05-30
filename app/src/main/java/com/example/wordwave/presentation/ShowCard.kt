@@ -1,6 +1,9 @@
 package com.example.wordwave.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import android.net.Uri
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +27,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -32,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.wordwave.R
+import androidx.core.net.toUri
 
 @Composable
 fun ShowCardScreen(navController: NavHostController, viewModel: DictionaryViewModel) {
@@ -68,21 +74,32 @@ fun ShowCardScreen(navController: NavHostController, viewModel: DictionaryViewMo
 
 @Composable
 private fun ImageUploadSection(viewModel: DictionaryViewModel) {
+    val imagePath = viewModel.cr?.word?.imagePath
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
-            .background(colorResource(R.color.grey_graph), RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(8.dp))
+            .background(colorResource(R.color.grey_graph)),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                painter = painterResource(R.drawable.image_placeholder),
-                contentDescription = "Upload Image",
-                tint = Color.Gray,
-                modifier = Modifier.size(48.dp)
+        if (imagePath != null) {
+            AsyncImage(
+                model = imagePath.toUri(),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
-            Text(text = "Картинка", color = Color.Gray, fontSize = 14.sp)
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    painter = painterResource(R.drawable.image_placeholder),
+                    contentDescription = "No image",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text(text = "Картинка", color = Color.Gray, fontSize = 14.sp)
+            }
         }
     }
 }

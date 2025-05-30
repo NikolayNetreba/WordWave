@@ -40,6 +40,8 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
 
     var currentDefinitions: List<Definition>? = null
     var currentWord: String? = null
+    var currentImagePath: String? = null
+
     var cr: WordWithTranslations? = null
 
     fun saveDefinitions() {
@@ -48,10 +50,10 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
         }
 
         val map = HashMap<String, List<String>>()
-        for (df in currentDefinitions) {
+        for (df in currentDefinitions!!) {
             for (tr in df.tr) {
                 if (tr.syn == null) {
-                    map.put(tr.text, emptyList())
+                    map[tr.text] = emptyList()
                     continue
                 }
 
@@ -60,11 +62,11 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
                     synonyms += sn.text;
                 }
 
-                map.put(tr.text, synonyms)
+                map[tr.text] = synonyms
             }
         }
 
-        addWordWithTranslations(currentWord!!, map)
+        addWordWithTranslations(currentWord!!, map, currentImagePath)
         updateWordsWithTranslations("хуй")
     }
 
@@ -122,12 +124,13 @@ class DictionaryViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun addWordWithTranslations(word: String, translations: Map<String, List<String>>) {
+    fun addWordWithTranslations(word: String, translations: Map<String, List<String>>, imagePath: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             repo.upsertWordWithTranslations(
                 Word(
                     text = word,
-                    language = "en"
+                    language = "en",
+                    imagePath = imagePath
                 ),
                 translations
             )

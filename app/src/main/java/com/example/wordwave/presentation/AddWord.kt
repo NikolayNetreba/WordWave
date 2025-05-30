@@ -1,8 +1,12 @@
 package com.example.wordwave.presentation
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
@@ -26,6 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.wordwave.R
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -64,7 +70,7 @@ fun AddWordScreen(
                         .padding(dimensionResource(R.dimen.padding_15))
                 ) {
                     item {
-                        ImageUploadSection()
+                        ImageUploadSection(dViewModel)
                         Spacer(modifier = Modifier.height(16.dp))
                         WordInputSection(TviewModel, dViewModel)
                         Spacer(modifier = Modifier.height(16.dp))
@@ -135,22 +141,58 @@ private fun TopBar(
 }
 
 @Composable
-private fun ImageUploadSection() {
+private fun ImageUploadSection(dViewModel: DictionaryViewModel) {
+    var imageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var menuExpanded by remember { mutableStateOf(false) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            imageUri = it
+            dViewModel.currentImagePath = it.toString()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
-            .background(colorResource(R.color.grey_graph), RoundedCornerShape(8.dp)),
+            .clip(RoundedCornerShape(8.dp))
+            .background(colorResource(R.color.grey_graph))
+            .clickable { menuExpanded = true },
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                painter = painterResource(R.drawable.image_placeholder),
-                contentDescription = "Upload Image",
-                tint = Color.Gray,
-                modifier = Modifier.size(48.dp)
+        // Меню выбора
+        DropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Выбрать из галереи") },
+                onClick = {
+                    menuExpanded = false
+                    launcher.launch("image/*")
+                }
             )
-            Text(text = "Картинка", color = Color.Gray, fontSize = 14.sp)
+        }
+
+        // Показ выбранной картинки или заглушки
+        val displayUri = imageUri ?: dViewModel.currentImagePath?.let(Uri::parse)
+        if (displayUri != null) {
+            AsyncImage(
+                model = displayUri,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    painterResource(R.drawable.image_placeholder),
+                    contentDescription = "Upload Image",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(48.dp)
+                )
+                Text("Картинка", color = Color.Gray, fontSize = 14.sp)
+            }
         }
     }
 }
@@ -308,6 +350,7 @@ private fun WordInputSection(tViewModel: TranslationViewModel, dViewModel: Dicti
         }
     }
 }
+
 
 @Composable
 private fun ExampleUsageSection(viewModel: TranslationViewModel) {
